@@ -25,6 +25,7 @@ case "$type" in ''|*[!ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_]*) usage ;; esac
 origin='' marketplaces='' start='' end='' wait='' every=30
 options=()
 while [ $# -gt 0 ]; do
+  case "$1" in --origin|--marketplace|--start|--end|--option|--wait|--every) [ $# -ge 2 ] || usage ;; esac
   case "$1" in
     --origin) origin="${2-}"; shift 2 ;;
     --marketplace) marketplaces="${2-}"; shift 2 ;;
@@ -50,7 +51,7 @@ receipt="$dir/receipt.json"
 mkdir -p "$dir" || exit 1
 
 now() { date -u +%Y-%m-%dT%H:%M:%SZ; }
-next() { local n=1; while [ -e "$dir/$1-$n.json" ]; do n=$((n + 1)); done; printf '%s-%s' "$1" "$n"; }
+next() { local n=1; while [ -e "$dir/$1-$n.json" ] || [ -e "$dir/$1-$n.cx.json" ]; do n=$((n + 1)); done; printf '%s-%s' "$1" "$n"; }
 
 # cx <name> <method> <path> [cx raw flags...]: the reply lands as <name>.json, cx's own receipt as <name>.cx.json.
 call() {
@@ -88,7 +89,7 @@ drop_link() { # the link leaves a landed getReportDocument reply, whole or cut s
   else rm -f "$1.new" "$1"; fi
 }
 
-report_id=''
+report_id='' status=''
 if [ -f "$receipt" ]; then
   status=$(jq -r '.processingStatus // ""' "$receipt")
   report_id=$(jq -r '.reportId // ""' "$receipt")
@@ -112,14 +113,16 @@ fi
 if [ -z "$report_id" ]; then
   jq -c '{reportType, marketplaceIds} + (if .dataStartTime then {dataStartTime} else {} end)
     + (if .dataEndTime then {dataEndTime} else {} end) + (if .reportOptions then {reportOptions} else {} end)' <<<"$ask" >"$dir/create-body.json"
-  call create POST "$API/reports" --header content-type=application/json --body "$dir/create-body.json" || exit 1
-  report_id=$(jq -r '.reportId // ""' "$dir/create.json")
-  [ -n "$report_id" ] || { say "createReport answered without a reportId: $dir/create.json"; exit 1; }
+  name=$(next create)
+  call "$name" POST "$API/reports" --header content-type=application/json --body "$dir/create-body.json" || exit 1
+  report_id=$(jq -r '.reportId // ""' "$dir/$name.json")
+  [ -n "$report_id" ] || { say "createReport answered without a reportId: $dir/$name.json"; exit 1; }
   record '.reportId = $id | .source = "createReport"' --arg id "$report_id"
 fi
 
+# A receipt already terminal is a run that stopped at the document: it picks up there.
 deadline=$((SECONDS + wait))
-while :; do
+while ! terminal "$status"; do
   name=$(next report)
   call "$name" GET "$API/reports/$report_id" || exit 1
   record '. + ($r[0] | {processingStatus, createdTime, processingStartTime, processingEndTime, reportDocumentId}) | .lastRead = $file' \
@@ -134,15 +137,16 @@ document_id=$(jq -r '.reportDocumentId // ""' "$receipt")
 [ -n "$document_id" ] || finish
 
 # The document's link is used here once and never printed; the landed reply keeps everything but the link.
-call document GET "$API/documents/$document_id"; code=$?
+name=$(next document)
+call "$name" GET "$API/documents/$document_id"; code=$?
 url='' compression=''
 if [ "$code" -eq 0 ]; then
-  url=$(jq -r '.url // ""' "$dir/document.json")
-  compression=$(jq -r '.compressionAlgorithm // ""' "$dir/document.json")
+  url=$(jq -r '.url // ""' "$dir/$name.json")
+  compression=$(jq -r '.compressionAlgorithm // ""' "$dir/$name.json")
 fi
-[ ! -f "$dir/document.json" ] || drop_link "$dir/document.json"
+[ ! -f "$dir/$name.json" ] || drop_link "$dir/$name.json"
 [ "$code" -eq 0 ] || exit 1
-[ -n "$url" ] || { say "getReportDocument answered without a link: $dir/document.json"; exit 1; }
+[ -n "$url" ] || { say "getReportDocument answered without a link: $dir/$name.json"; exit 1; }
 if ! curl -sS --fail -o "$dir/document.download" "$url" 2>/dev/null; then
   say "the document's download failed; the next run asks getReportDocument for a fresh link"
   exit 1

@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+# In front of curl for the tests: each run is appended to $STUB/calls.log as "DOWNLOAD", without its link.
+echo DOWNLOAD >>"$STUB/calls.log"
+here=$(cd "$(dirname "$0")" && pwd)
+PATH=$(printf '%s' "$PATH" | tr ':' '\n' | grep -vx "$here" | paste -sd: -) exec curl "$@"
