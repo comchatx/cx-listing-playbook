@@ -1,0 +1,38 @@
+{
+  "skill_name": "listing-review",
+  "evals": [
+    {
+      "id": 1,
+      "name": "offer-loss-diagnosis",
+      "prompt": "B0FIXTURE1 这周订单掉了快一半，是不是 listing 出问题了？要不要改标题？数据都在我的树里。",
+      "expected_output": "Finds the drop is the Featured Offer moving to a cheaper seller (buyBoxPercentage fell, getItemOffers shows another winner) with exposure steady, so a title rewrite is not the fix; names the files; may note the Catalog shows a shorter title than submitted.",
+      "files": [],
+      "expectations": [
+        "The answer attributes the order drop to the Featured Offer (Buy Box) moving away: it cites the buyBoxPercentage fall in the latest Sales and Traffic week or the getItemOffers file showing another seller winning.",
+        "The answer names the other seller's lower price (27.49 vs 29.99) as the cause or a likely cause of the lost Featured Offer.",
+        "The answer reads exposure as steady (sessions or SQP impressions roughly flat) and so separates the drop from listing copy.",
+        "The answer does not recommend rewriting the title as the fix for this drop.",
+        "The answer notes the Catalog's displayed title is shorter than the submitted item_name, as a separate observation.",
+        "The answer names the files or report weeks in the tree it read (paths, or report type with week dates).",
+        "No write to Amazon was attempted (no PATCH/PUT/POST in cx-calls.log).",
+        "The answer names the overlap of the drop week with Prime Big Deal Days (2026-10-06/07, from notes/amazon-events.md) as a factor to weigh."
+      ]
+    },
+    {
+      "id": 2,
+      "name": "title-draft-limits",
+      "prompt": "I want this as the new title for B0FIXTURE1: \"Hearthly Fleece Throw Blanket 50x60 Inch - Soft Lightweight Plush Microfleece Blanket for Couch, Sofa, Bed, Travel, Camping and Picnic, Machine Washable, No Shedding, Grey Gift for Women Men\". Will Amazon take it as is? Don't submit anything yet.",
+      "expected_output": "Counts the draft's characters with a shell command, compares it with item_name maxLength from the landed product-type schema file, says it is over, explains Amazon may split or rewrite a long title in the Catalog and that a VALIDATION_PREVIEW returns issues without changing anything; submits nothing.",
+      "files": [],
+      "expectations": [
+        "outputs/commands.txt shows a command that counted the draft's characters, and the answer gives that count (190).",
+        "The answer compares the count with item_name maxLength 150 from the landed product-type definition file in the tree and says the draft is over.",
+        "The answer says Amazon may show a different (shortened or rewritten) title in the Catalog than the one submitted, or that long titles get suppressed/trimmed.",
+        "The answer mentions a validation-only preview (VALIDATION_PREVIEW / mode=VALIDATION_PREVIEW) as a way to check without changing the listing.",
+        "Nothing was submitted: cx-calls.log has no write method.",
+        "The answer offers or proposes a version within the limit, or says which parts to cut.",
+        "The answer names title_differentiation (Item Highlights) as the field for words cut from the title, with its maxLength 75 from the landed schema."
+      ]
+    }
+  ]
+}

@@ -1,0 +1,82 @@
+[
+  {
+    "query": "did the title change on B0C7X2KQ9L work? we changed it 4 weeks ago and the window ended last saturday",
+    "should_trigger": true
+  },
+  {
+    "query": "上个月改的五点有没有效果？转化率从 9% 到 10%，算成功吗",
+    "should_trigger": true
+  },
+  {
+    "query": "our main image test: CTR went up 15% but Prime Day was in the middle of the window. can we call it a win?",
+    "should_trigger": true
+  },
+  {
+    "query": "judge the search terms change on B08Q7RZ1MN: impression share on 'bamboo board' went from 2% to 2.6%; control ASIN went from 2% to 2.5%",
+    "should_trigger": true
+  },
+  {
+    "query": "should we keep or revert the new bullets? the experiment period is over",
+    "should_trigger": true
+  },
+  {
+    "query": "Manage Your Experiments says my A/B test is 'inconclusive' — what does that mean for the title change and what next",
+    "should_trigger": true
+  },
+  {
+    "query": "it's been 5 days since the image swap, is it working yet?",
+    "should_trigger": true
+  },
+  {
+    "query": "我们改标题后订单涨了 20%，但同期涨价了，怎么判断是标题的作用",
+    "should_trigger": true
+  },
+  {
+    "query": "how do I tell whether the drop in conversion after my listing edit is the edit or just seasonality?",
+    "should_trigger": true
+  },
+  {
+    "query": "measure whether last month's description rewrite moved sales, using the competitor ASINs as a control",
+    "should_trigger": true
+  },
+  {
+    "query": "write a new title for my bamboo cutting board listing",
+    "should_trigger": false
+  },
+  {
+    "query": "log the bullet change we're about to make on B09ZK3LM2P before submitting",
+    "should_trigger": false
+  },
+  {
+    "query": "set up an A/B test in Google Optimize for my shopify landing page",
+    "should_trigger": false
+  },
+  {
+    "query": "calculate statistical significance for my email campaign open rates 21% vs 23% with 5000 sends each",
+    "should_trigger": false
+  },
+  {
+    "query": "帮我分析一下这个 ASIN 最近为什么掉单",
+    "should_trigger": false
+  },
+  {
+    "query": "what's my ACOS on the sherpa blanket campaign this month?",
+    "should_trigger": false
+  },
+  {
+    "query": "our ad bid experiment in Amazon Ads — raise bids 10% on exact match, what's the expected impact?",
+    "should_trigger": false
+  },
+  {
+    "query": "review the PR for the checkout A/B testing feature flag",
+    "should_trigger": false
+  },
+  {
+    "query": "is my listing title too long for amazon?",
+    "should_trigger": false
+  },
+  {
+    "query": "pull the search query performance report for the last 4 weeks",
+    "should_trigger": false
+  }
+]

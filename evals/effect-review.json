@@ -1,0 +1,55 @@
+{
+  "skill_name": "effect-review",
+  "evals": [
+    {
+      "id": 5,
+      "name": "sale-overlap-title",
+      "prompt": "B0FIXTURE2 上个月改标题那次，效果怎么样？算成功吗？",
+      "expected_output": "Reads the change file and its windows; the observation window overlaps Prime Big Deal Days and its early deals, so the verdict is cannot tell, naming the event; the next step is the one the change file wrote (extend once by two weeks); notes no control-set data is in the tree.",
+      "files": [],
+      "expectations": [
+        "The answer reads the change file's windows (observation 2026-09-27 to 2026-10-10) and expected metric.",
+        "The answer identifies that the observation window overlaps Prime Big Deal Days (2026-10-06/07, early deals from 2026-09-30) from notes/amazon-events.md.",
+        "The verdict is 'cannot tell' (or equivalent: inconclusive), not 'held'/'success'.",
+        "The answer names the next step the change file wrote: extend the observation once by two weeks.",
+        "The answer says the control set's data (B0COMPET01/02) is not in the tree, or that the control could not be read.",
+        "The answer quotes or computes the asinImpressionShare movement on the two words bet on from the SQP files.",
+        "The answer uses no ASIN with its own change in the windows (B0FIXTURE5) and no variation sibling as a control.",
+        "The proposed extension follows the change file (extend once, two weeks) and gives its dates."
+      ]
+    },
+    {
+      "id": 6,
+      "name": "window-not-ended-image",
+      "prompt": "Did the new main image on B0FIXTURE3 work? It's been over a week since we switched.",
+      "expected_output": "Reads the change file: the observation window ends 2026-10-31, so it gives no verdict yet, only progress; says when a verdict can be read.",
+      "files": [],
+      "expectations": [
+        "The answer reads the change file and states the observation window ends 2026-10-31.",
+        "The answer gives no verdict (held / not held) before the window ends.",
+        "The answer says when a verdict can be read (after 2026-10-31, once that week's SQP data lands).",
+        "The answer does not claim the image worked or failed based on partial data.",
+        "The answer names the sale's early deals (from 2026-09-30) falling in the last baseline week.",
+        "The answer names B0FIXTURE7's pending search-terms change, which removes 'waffle knit throw', as a possible confounder."
+      ]
+    },
+    {
+      "id": 7,
+      "name": "control-subtraction-bullets",
+      "prompt": "Judge the B0FIXTURE5 bullet change for me. Conversion went from 10% to 11%, that's a win, right?",
+      "expected_output": "Takes out the control (B0FIXTURE6 moved by the same +10%) before reading B0FIXTURE5's move; net is about zero with large counts, so not held (or at least not held), and orders checked; does not call it a win.",
+      "files": [],
+      "expectations": [
+        "The answer uses B0FIXTURE6 as the control named in the change file.",
+        "The answer computes the control's conversion movement over the same windows (about +10% relative, ~9.0% to ~9.9%).",
+        "The answer takes the control's movement out of B0FIXTURE5's move and finds the net effect about zero.",
+        "The answer does not call the change a win; verdict is not held or cannot tell, below the +5% smallest move that counts.",
+        "The answer checks orders (unitsOrdered) alongside conversion.",
+        "The answer reads the windows from the change file (baseline 2026-08-30..09-12, observation 09-13..09-26).",
+        "The answer gives an uncertainty range or count-based noise for the net effect.",
+        "The answer uses no week after 2026-09-26 (including the sale weeks) as evidence for the verdict.",
+        "The answer gives the next step the change file wrote for its verdict (cannot tell leads to keep)."
+      ]
+    }
+  ]
+}
