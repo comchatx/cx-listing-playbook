@@ -3,7 +3,8 @@
 # It answers from the scenario directory $STUB: each call is appended to $STUB/calls.log as "METHOD PATH QUERY...";
 # GET /reports/2021-06-30/reports answers $STUB/reports.json, POST answers $STUB/create.json, a report id answers
 # the next line of $STUB/statuses (the last line repeats) and a document id answers $STUB/document.json.
-# A file $STUB/fail-<n> makes the n-th call fail as cx reports a 429.
+# A file $STUB/fail-<n> makes the n-th call fail as cx reports a 429. A file $STUB/cut-document makes getReportDocument
+# end as cx reports a 2xx reply that broke off: the bytes that came, through the link, land and the call fails.
 set -euo pipefail
 [ "$1 $2" = "raw amazon-sp-api" ] || { echo "stub cx: only raw amazon-sp-api" >&2; exit 2; }
 shift 2
@@ -35,7 +36,13 @@ fi
 case "$method $path" in
   "GET /reports/2021-06-30/reports") cp "$STUB/reports.json" "$output" ;;
   "POST /reports/2021-06-30/reports") cp "$STUB/create.json" "$output" ;;
-  "GET /reports/2021-06-30/documents/"*) cp "$STUB/document.json" "$output" ;;
+  "GET /reports/2021-06-30/documents/"*)
+    if [ -e "$STUB/cut-document" ]; then
+      sed -E 's/("url":"[^"]*",).*/\1/' "$STUB/document.json" | tr -d '\n' >"$output"
+      receipt 200 failed
+      exit 1
+    fi
+    cp "$STUB/document.json" "$output" ;;
   "GET /reports/2021-06-30/reports/"*)
     id="${path##*/}"
     status=$(head -n 1 "$STUB/statuses")

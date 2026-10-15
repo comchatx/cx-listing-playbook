@@ -20,7 +20,8 @@ say() { printf '%s\n' "$*"; }
 
 [ $# -ge 1 ] || usage
 type="$1"; shift
-case "$type" in -*|'') usage ;; esac
+# Amazon's report type names are capitals, digits and _; anything else could reach outside the report tree.
+case "$type" in ''|*[!ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_]*) usage ;; esac
 origin='' marketplaces='' start='' end='' wait='' every=30
 options=()
 while [ $# -gt 0 ]; do
@@ -81,6 +82,12 @@ finish() { # the run's last line: status, id, where it is
 
 terminal() { case "$1" in DONE|CANCELLED|FATAL) return 0 ;; *) return 1 ;; esac; }
 
+drop_link() { # the link leaves a landed getReportDocument reply, whole or cut short
+  if jq 'del(.url)' "$1" >"$1.new" 2>/dev/null; then mv "$1.new" "$1"
+  elif jq -Rsj 'gsub("\"url\"\\s*:\\s*\"([^\"\\\\]|\\\\.)*\"?"; "")' "$1" >"$1.new" 2>/dev/null; then mv "$1.new" "$1"
+  else rm -f "$1.new" "$1"; fi
+}
+
 report_id=''
 if [ -f "$receipt" ]; then
   status=$(jq -r '.processingStatus // ""' "$receipt")
@@ -127,10 +134,14 @@ document_id=$(jq -r '.reportDocumentId // ""' "$receipt")
 [ -n "$document_id" ] || finish
 
 # The document's link is used here once and never printed; the landed reply keeps everything but the link.
-call document GET "$API/documents/$document_id" || exit 1
-url=$(jq -r '.url // ""' "$dir/document.json")
-compression=$(jq -r '.compressionAlgorithm // ""' "$dir/document.json")
-jq 'del(.url)' "$dir/document.json" >"$dir/document.json.new" && mv "$dir/document.json.new" "$dir/document.json"
+call document GET "$API/documents/$document_id"; code=$?
+url='' compression=''
+if [ "$code" -eq 0 ]; then
+  url=$(jq -r '.url // ""' "$dir/document.json")
+  compression=$(jq -r '.compressionAlgorithm // ""' "$dir/document.json")
+fi
+[ ! -f "$dir/document.json" ] || drop_link "$dir/document.json"
+[ "$code" -eq 0 ] || exit 1
 [ -n "$url" ] || { say "getReportDocument answered without a link: $dir/document.json"; exit 1; }
 if ! curl -sS --fail -o "$dir/document.download" "$url" 2>/dev/null; then
   say "the document's download failed; the next run asks getReportDocument for a fresh link"
@@ -147,7 +158,7 @@ case "$(head -c 64 "$dir/document.body" | LC_ALL=C tr -d ' \t\r\n\357\273\277' |
   '<') ext=xml ;;
   *) ext=txt ;;
 esac
-stem=document; [ "$status" = FATAL ] && stem=fatal-explanation
+stem=report; [ "$status" = FATAL ] && stem=fatal-explanation
 mv "$dir/document.body" "$dir/$stem.$ext"
 record '.document = $file | .compressionAlgorithm = (if $c == "" then null else $c end)' --arg file "$stem.$ext" --arg c "$compression"
 finish
