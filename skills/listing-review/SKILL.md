@@ -32,7 +32,7 @@ The standing instruction, `/tenant/listings/<ASIN>/watch.md`, holds the seller's
 
 `scripts/report.sh <reportType> --origin <origin> --marketplace <id>[,<id>…] [--start <ISO 8601>] [--end <ISO 8601>] [--option <name>=<value>]… --wait <seconds> [--every <seconds>]`
 
-It reuses a same-ask landed receipt (P-report-lifecycle-6).
+Each run asks Amazon anew but carries on its own unfinished report, and earlier reports stay under the ask's directory, each receipt with Amazon's `createdTime` (P-report-lifecycle-26, P-report-lifecycle-17).
 It lands the document and `receipt.json` under `/tenant/reports/<reportType>/<ask>/`, outliving the report id Amazon keeps for a limited period (P-report-lifecycle-17).
 `DONE`, `CANCELLED` and `FATAL` are final; `IN_QUEUE` or `IN_PROGRESS` at the `--wait` ceiling is unfinished, not failed (P-report-lifecycle-1).
 `CANCELLED` is no report (explicit cancel, no data, or a repeat inside the type's period), never zero sales (P-report-lifecycle-2).

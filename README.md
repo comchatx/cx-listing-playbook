@@ -22,7 +22,7 @@ Each skill's detail is under its `references/`.
 |---|---|
 | `/tenant/listings/<ASIN>/watch.md` | The standing instruction `/listing-watch` writes |
 | `/tenant/listings/<ASIN>/changes/` | One file per listing change; changes made together are one change |
-| `/tenant/reports/<reportType>/<ask>/` | One report: `receipt.json` with the report id and Amazon's status, each reply as Amazon gave it, and the document |
+| `/tenant/reports/<reportType>/<ask>/<n>/` | One report of that ask: `receipt.json` with the report id, Amazon's status and `createdTime`, each reply as Amazon gave it, and the document |
 
 ## The report script
 
@@ -31,7 +31,7 @@ scripts/report.sh <reportType> --origin <origin> --marketplace <id>[,<id>...] [-
                   [--option <name>=<value>]... --wait <seconds> [--every <seconds>]
 ```
 
-It asks Amazon's Reports API through `cx raw amazon-sp-api`: `createReport`, `getReport` until a terminal status or the `--wait` ceiling, `getReportDocument` and the document, decompressed, landed beside the receipt. A landed receipt of the same ask is read instead of creating again, and a report still queued at the ceiling ends the run with its id and status (exit 3) for the next run to resume. It has no rate limiter and no retry of its own. Report types, their options and their periods are the `amazon-sp-api` skill's (`references/door.md`). It needs `bash`, `jq`, `curl` and `gzip`, which the box has.
+It asks Amazon's Reports API through `cx raw amazon-sp-api`: `createReport`, `getReport` until a terminal status or the `--wait` ceiling, `getReportDocument` and the document, decompressed, landed beside the receipt. Each run asks for a report of its own, except that it carries on the ask's report not yet landed: one still queued at the ceiling ends the run with its id and status (exit 3) for the next run to carry on. Earlier reports stay as they landed. It has no rate limiter and no retry of its own. Report types, their options and their periods are the `amazon-sp-api` skill's (`references/door.md`). It needs `bash`, `jq`, `curl` and `gzip`, which the box has.
 
 ## What it needs
 
