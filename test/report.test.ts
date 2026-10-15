@@ -57,7 +57,6 @@ it("creates, polls to DONE, lands the decompressed document beside a receipt wit
   const got = w.run("--wait", "10", "--every", "1");
   expect(got.exit).toBe(0);
   expect(w.calls()).toEqual([
-    "GET /reports/2021-06-30/reports reportTypes=STUB_REPORT marketplaceIds=ATVPDKIKX0DER processingStatuses=IN_QUEUE,IN_PROGRESS,DONE",
     "POST /reports/2021-06-30/reports",
     "GET /reports/2021-06-30/reports/50001",
     "GET /reports/2021-06-30/reports/50001",
@@ -74,7 +73,7 @@ it("creates, polls to DONE, lands the decompressed document beside a receipt wit
   const ask = relative(w.tree, w.askDir()).split(sep).join("/");
   expect(w.listing()).toEqual([
     "document.tsv.gz", "stub", "stub/calls.log", "stub/create.json", "stub/document.json", "stub/reports.json", "stub/statuses", "stub/statuses.bak", "tenant", "tenant/reports", "tenant/reports/STUB_REPORT", `tenant/${ask}`,
-    ...["create-1.cx.json", "create-1.json", "create-body.json", "document-1.cx.json", "document-1.json", "receipt.json", "report-1.cx.json", "report-1.json", "report-2.cx.json", "report-2.json", "report-3.cx.json", "report-3.json", "report.txt", "reports-1.cx.json", "reports-1.json"].map((file) => `tenant/${ask}/${file}`),
+    ...["create-1.cx.json", "create-1.json", "create-body.json", "document-1.cx.json", "document-1.json", "receipt.json", "report-1.cx.json", "report-1.json", "report-2.cx.json", "report-2.json", "report-3.cx.json", "report-3.json", "report.txt"].map((file) => `tenant/${ask}/${file}`),
   ].sort());
 });
 
@@ -115,7 +114,7 @@ it("a getReportDocument reply cut short after its link ends the run failed, and 
 });
 
 it("a failed createReport is asked again by the next run, and cx's receipt of the failure is kept", () => {
-  const w = world({ statuses: ["DONE"], failOn: [2] });
+  const w = world({ statuses: ["DONE"], failOn: [1] });
   const first = w.run("--wait", "0");
   expect(first.exit).toBe(1);
   expect(w.calls().filter((call) => call.startsWith("POST"))).toHaveLength(1);
@@ -175,19 +174,18 @@ it("one wait: at the ceiling a queued report ends the run with its id and status
   const second = w.run("--wait", "5", "--every", "1");
   expect(second.exit).toBe(0);
   expect(w.calls().filter((call) => call.startsWith("POST"))).toHaveLength(1);
-  expect(w.calls().filter((call) => call.startsWith("GET /reports/2021-06-30/reports reportTypes"))).toHaveLength(1);
 });
 
-it("a matching report from getReports is used instead of creating one; another range or store is not", () => {
-  const match = { reportId: "40001", reportType: TYPE, processingStatus: "DONE", marketplaceIds: ["ATVPDKIKX0DER"], dataStartTime: "2026-10-04T00:00:00+00:00", dataEndTime: "2026-10-10T23:59:59+00:00" };
-  const w = world({ statuses: ["DONE"], reports: [{ ...match, reportId: "40002", dataStartTime: "2026-09-27T00:00:00+00:00" }, { ...match, reportId: "40003", marketplaceIds: ["A2EUQ1WTGCTBG2"] }, match], gzip: false });
+it("an ask is answered by its own report: a listed report of the same type, store and range is not taken, since a listing cannot show which ask made it", () => {
+  const listed = { reportId: "40001", reportType: TYPE, processingStatus: "DONE", marketplaceIds: ["ATVPDKIKX0DER"], dataStartTime: "2026-10-04T00:00:00+00:00", dataEndTime: "2026-10-10T23:59:59+00:00", reportDocumentId: "amzn1.spdoc.1.4.na.STUB" };
+  const w = world({ statuses: ["DONE"], reports: [listed], gzip: false });
   expect(w.run("--wait", "0").exit).toBe(0);
-  expect(w.calls().filter((call) => call.startsWith("POST"))).toEqual([]);
-  expect(w.calls()).toContain("GET /reports/2021-06-30/reports/40001");
-  expect(w.receipt()).toMatchObject({ reportId: "40001", source: "getReports", compressionAlgorithm: null });
+  expect(w.calls().filter((call) => call.startsWith("GET /reports/2021-06-30/reports "))).toEqual([]);
+  expect(w.calls()[0]).toBe("POST /reports/2021-06-30/reports");
+  expect(w.receipt()).toMatchObject({ reportId: "50001", source: "createReport", compressionAlgorithm: null });
 });
 
-it("an ask with report options creates without getReports, and the options go in the body", () => {
+it("an ask with report options puts them in the create body", () => {
   const w = world({ statuses: ["DONE"] });
   expect(w.run("--option", "reportPeriod=WEEK", "--option", "asin=<ASIN>", "--wait", "0").exit).toBe(0);
   expect(w.calls()[0]).toBe("POST /reports/2021-06-30/reports");
@@ -205,10 +203,10 @@ it("CANCELLED ends with no document; FATAL's document lands as Amazon's explanat
 });
 
 it("a call cx reports as failed (a 429) ends the run at once: no retry, no limiter, Amazon's words kept", () => {
-  const w = world({ statuses: ["IN_QUEUE", "DONE"], failOn: [3] });
+  const w = world({ statuses: ["IN_QUEUE", "DONE"], failOn: [2] });
   const got = w.run("--wait", "5", "--every", "1");
   expect(got.exit).toBe(1);
-  expect(w.calls()).toHaveLength(3);
+  expect(w.calls()).toHaveLength(2);
   expect(got.out).toContain("http_status\":429");
   expect(readFileSync(join(w.askDir(), "report-1.json"), "utf8")).toContain("QuotaExceeded");
   const resumed = w.run("--wait", "5", "--every", "1");

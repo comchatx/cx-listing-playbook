@@ -6,8 +6,8 @@
 #
 # Every call goes through `cx raw amazon-sp-api`. The ask lands in <tree>/reports/<reportType>/<ask>/ with
 # receipt.json (the report id and Amazon's processingStatus), each reply as Amazon gave it, and the document.
-# A landed receipt of the same ask is read instead of creating again; with no --option, getReports is asked
-# for a matching report first. One wait, its ceiling --wait: a report still queued then ends the run with its
+# A landed receipt of the same ask is read instead of creating again; otherwise the ask creates its own
+# report. One wait, its ceiling --wait: a report still queued then ends the run with its
 # id and status (exit 3), and the next run resumes that id. No limiter and no retry of its own.
 # Exit: 0 Amazon's terminal status (DONE, CANCELLED, FATAL); 1 a call or the download failed; 2 usage; 3 still queued.
 set -uo pipefail
@@ -96,18 +96,6 @@ if [ -f "$receipt" ]; then
   if terminal "$status" && { [ "$status" = CANCELLED ] || [ -n "$(jq -r '.document // empty' "$receipt")" ] || [ "$(jq -r '.reportDocumentId // ""' "$receipt")" = "" ]; }; then
     finish
   fi
-fi
-
-if [ -z "$report_id" ] && [ ${#options[@]} -eq 0 ] && [ -n "$start" ] && [ -n "$end" ]; then
-  name=$(next reports)
-  call "$name" GET "$API/reports" --query "reportTypes=$type" --query "marketplaceIds=$marketplaces" \
-    --query "processingStatuses=IN_QUEUE,IN_PROGRESS,DONE" || exit 1
-  report_id=$(jq -r --argjson ask "$ask" '
-    def t: if . == null then null else (sub("\\.[0-9]+"; "") | sub("(\\+00:00|Z)$"; "Z") | (try fromdateiso8601 catch .)) end;
-    [.reports[]? | select((.marketplaceIds | sort) == ($ask.marketplaceIds | sort)
-      and (.dataStartTime | t) == ($ask.dataStartTime | t) and (.dataEndTime | t) == ($ask.dataEndTime | t))]
-    | (map(select(.processingStatus == "DONE")) + map(select(.processingStatus != "DONE")))[0].reportId // ""' "$dir/$name.json")
-  [ -n "$report_id" ] && record '.reportId = $id | .source = "getReports"' --arg id "$report_id"
 fi
 
 if [ -z "$report_id" ]; then
