@@ -6,7 +6,7 @@ import json, os, sys, shutil
 
 root = sys.argv[1]
 T = os.path.join(root, "tenant")
-shutil.rmtree(root, ignore_errors=True)
+shutil.rmtree(T, ignore_errors=True)
 M = "ATVPDKIKX0DER"
 SELLER = "A1FIXTURESELLER"
 
@@ -96,8 +96,8 @@ rows = {
 for i, (s, e) in enumerate(weeks):
     doc = sat([(a, *rows[a][i]) for a in rows], f"{s}T00:00:00Z", f"{e}T23:59:59Z")
     d = f"reports/GET_SALES_AND_TRAFFIC_REPORT/{M}_{s}T00-00-00Z_{e}T23-59-59Z_fixture{i}"
-    put(f"{d}/document.json", doc)
-    put(f"{d}/receipt.json", {"reportId": f"9000{i}", "processingStatus": "DONE", "document": "document.json", "source": "createReport",
+    put(f"{d}/report.json", doc)
+    put(f"{d}/receipt.json", {"reportId": f"9000{i}", "processingStatus": "DONE", "document": "report.json", "source": "createReport",
                               "ask": {"reportType": "GET_SALES_AND_TRAFFIC_REPORT", "marketplaceIds": [M], "dataStartTime": f"{s}T00:00:00Z", "dataEndTime": f"{e}T23:59:59Z",
                                       "reportOptions": {"asinGranularity": "CHILD", "dateGranularity": "WEEK"}}})
 
@@ -129,8 +129,8 @@ for i, (s, e) in enumerate(weeks):
                                    "dataStartTime": s, "dataEndTime": e, "marketplaceIds": [M]},
            "dataByAsin": [sqp_row(a, s, e, q, *v[i]) for (a, q), v in sqp.items()]}
     d = f"reports/GET_BRAND_ANALYTICS_SEARCH_QUERY_PERFORMANCE_REPORT/{M}_{s}_{e}_fixture{i}"
-    put(f"{d}/document.json", doc)
-    put(f"{d}/receipt.json", {"reportId": f"9100{i}", "processingStatus": "DONE", "document": "document.json", "source": "createReport",
+    put(f"{d}/report.json", doc)
+    put(f"{d}/receipt.json", {"reportId": f"9100{i}", "processingStatus": "DONE", "document": "report.json", "source": "createReport",
                               "ask": {"reportType": "GET_BRAND_ANALYTICS_SEARCH_QUERY_PERFORMANCE_REPORT", "marketplaceIds": [M], "dataStartTime": s, "dataEndTime": e,
                                       "reportOptions": {"reportPeriod": "WEEK", "asin": "B0FIXTURE1 B0FIXTURE2 B0FIXTURE4"}}})
 

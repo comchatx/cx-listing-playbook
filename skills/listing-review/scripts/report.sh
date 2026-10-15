@@ -4,11 +4,13 @@
 #   report.sh <reportType> --origin <origin> --marketplace <id>[,<id>...] [--start <ISO 8601>] [--end <ISO 8601>]
 #             [--option <name>=<value>]... --wait <seconds> [--every <seconds>]
 #
-# Every call goes through `cx raw amazon-sp-api`. The ask lands in <tree>/reports/<reportType>/<ask>/ with
-# receipt.json (the report id and Amazon's processingStatus), each reply as Amazon gave it, and the document.
-# A landed receipt of the same ask is read instead of creating again; otherwise the ask creates its own
-# report. One wait, its ceiling --wait: a report still queued then ends the run with its
-# id and status (exit 3), and the next run resumes that id. No limiter and no retry of its own.
+# Every call goes through `cx raw amazon-sp-api` but one: the document's download, which curl makes from the link
+# getReportDocument returns; the link is used once and never printed or kept. The ask lands in
+# <tree>/reports/<reportType>/<ask>/ with receipt.json (the report id and Amazon's processingStatus), each reply as
+# Amazon gave it under a name of its own, and the document as report.<ext>. A landed receipt of the same ask is read
+# instead of creating again; otherwise the ask creates its own report. A run picks up where the last one stopped, so
+# a failed create or download is asked again by the next run. One wait, its ceiling --wait: a report still queued
+# then ends the run with its id and status (exit 3), and the next run resumes that id. No limiter and no retry of its own.
 # Exit: 0 Amazon's terminal status (DONE, CANCELLED, FATAL); 1 a call or the download failed; 2 usage; 3 still queued.
 set -uo pipefail
 
