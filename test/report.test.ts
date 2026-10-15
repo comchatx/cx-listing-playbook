@@ -18,7 +18,7 @@ const scratches: string[] = [];
 afterEach(() => { for (const scratch of scratches.splice(0)) rmSync(scratch, { recursive: true, force: true }); });
 
 /** A scenario for the stub `cx`: Amazon's replies in order, and a tree for the script to land in. */
-function world(options: { readonly statuses: readonly string[]; readonly reports?: readonly object[]; readonly gzip?: boolean; readonly document?: string; readonly failOn?: readonly number[]; readonly cutDocument?: boolean }) {
+function world(options: { readonly statuses: readonly string[]; readonly reports?: readonly object[]; readonly gzip?: boolean; readonly document?: string; readonly failOn?: readonly number[]; readonly refuseOn?: readonly number[]; readonly cutDocument?: boolean }) {
   const root = mkdtempSync(join(tmpdir(), "report-sh-"));
   scratches.push(root);
   const stub = join(root, "stub");
@@ -35,6 +35,7 @@ function world(options: { readonly statuses: readonly string[]; readonly reports
   writeFileSync(join(stub, "document.json"), JSON.stringify({ reportDocumentId: "amzn1.spdoc.1.4.na.STUB", url: `file://${download}`, ...(options.gzip === false ? {} : { compressionAlgorithm: "GZIP" }) }));
   writeFileSync(join(stub, "calls.log"), "");
   for (const n of options.failOn ?? []) writeFileSync(join(stub, `fail-${n}`), "");
+  for (const n of options.refuseOn ?? []) writeFileSync(join(stub, `refuse-${n}`), "");
   if (options.cutDocument === true) writeFileSync(join(stub, "cut-document"), "");
   const runAs = (type: string, ...args: string[]) => {
     const done = spawnSync("bash", [SCRIPT, type, ...ASK, ...args], { encoding: "utf8", timeout: 20_000, env: { ...process.env, PATH: `${STUB}:${process.env["PATH"]}`, STUB: stub, TENANT_TREE: tree } });
@@ -127,6 +128,15 @@ it("a failed createReport is asked again by the next run, and cx's receipt of th
   expect(JSON.parse(readFileSync(join(w.askDir(), "create-2.json"), "utf8"))).toEqual({ reportId: "50001" });
 });
 
+it("a call cx refuses lands no reply; cx's refusal is kept and the next run asks under a name of its own", () => {
+  const w = world({ statuses: ["DONE"], refuseOn: [1] });
+  expect(w.run("--wait", "0").exit).toBe(1);
+  expect(existsSync(join(w.askDir(), "create-1.json"))).toBe(false);
+  expect(w.run("--wait", "0").exit).toBe(0);
+  expect(JSON.parse(readFileSync(join(w.askDir(), "create-1.cx.json"), "utf8"))).toMatchObject({ refusal: { reason: "out_of_scope" } });
+  expect(JSON.parse(readFileSync(join(w.askDir(), "create-2.json"), "utf8"))).toEqual({ reportId: "50001" });
+});
+
 it("a failed download is asked again by the next run, from getReportDocument, without polling a finished report again", () => {
   const w = world({ statuses: ["DONE"] });
   const bytes = readFileSync(w.download);
@@ -170,10 +180,11 @@ it("one wait: at the ceiling a queued report ends the run with its id and status
   const first = w.run("--wait", "0");
   expect(first.exit).toBe(3);
   expect(first.out).toBe(`IN_QUEUE 50001 since 2026-10-14T00:00:00+00:00 ${join(w.askDir(), "receipt.json")}`);
+  expect(w.calls()).toEqual(["POST /reports/2021-06-30/reports", "GET /reports/2021-06-30/reports/50001"]);
   expect(w.receipt()).toMatchObject({ reportId: "50001", processingStatus: "IN_QUEUE" });
   const second = w.run("--wait", "5", "--every", "1");
   expect(second.exit).toBe(0);
-  expect(w.calls().filter((call) => call.startsWith("POST"))).toHaveLength(1);
+  expect(w.calls().slice(2)).toEqual(["GET /reports/2021-06-30/reports/50001", "GET /reports/2021-06-30/reports/50001", "GET /reports/2021-06-30/documents/amzn1.spdoc.1.4.na.STUB", "DOWNLOAD"]);
 });
 
 it("an ask is answered by its own report: a listed report of the same type, store and range is not taken, since a listing cannot show which ask made it", () => {

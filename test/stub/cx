@@ -3,7 +3,7 @@
 # It answers from the scenario directory $STUB: each call is appended to $STUB/calls.log as "METHOD PATH QUERY...";
 # GET /reports/2021-06-30/reports answers $STUB/reports.json, POST answers $STUB/create.json, a report id answers
 # the next line of $STUB/statuses (the last line repeats) and a document id answers $STUB/document.json.
-# A file $STUB/fail-<n> makes the n-th call fail as cx reports a 429. A file $STUB/cut-document makes getReportDocument
+# A file $STUB/fail-<n> makes the n-th call fail as cx reports a 429; $STUB/refuse-<n> makes cx refuse it, with no reply. A file $STUB/cut-document makes getReportDocument
 # end as cx reports a 2xx reply that broke off: the bytes that came, through the link, land and the call fails.
 set -euo pipefail
 [ "$1 $2" = "raw amazon-sp-api" ] || { echo "stub cx: only raw amazon-sp-api" >&2; exit 2; }
@@ -26,6 +26,11 @@ echo "$line" >>"$STUB/calls.log"
 n=$(wc -l <"$STUB/calls.log" | tr -d ' ')
 
 receipt() { printf '{"request_id":"stub-%s","paths":[{"path":"%s","origin":"https://sellingpartnerapi-na.amazon.com","http_status":%s,"outcome":{"kind":"%s"},"file":"%s"}],"cost":[]}\n' "$n" "$path" "$1" "$2" "$output"; }
+
+if [ -e "$STUB/refuse-$n" ]; then
+  echo '{"refusal":{"reason":"out_of_scope","detail":"stub refusal"},"paths":[],"cost":[]}'
+  exit 2
+fi
 
 if [ -e "$STUB/fail-$n" ]; then
   echo '{"errors":[{"code":"QuotaExceeded","message":"You exceeded your quota for the requested resource."}]}' >"$output"

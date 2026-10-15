@@ -29,10 +29,10 @@ it("each template expands in a pi session: the ASIN and the seller's own words r
   for (const text of [review, watch]) expect(text).not.toMatch(/\$\{?[@0-9A]/);
 });
 
-it("the package carries no dependency and no extension", () => {
+it("the package carries no dependency, no install script and no extension", () => {
   const manifest = JSON.parse(readFileSync(join(ROOT, "package.json"), "utf8")) as Record<string, unknown>;
-  expect(manifest["dependencies"]).toBeUndefined();
-  expect(manifest["peerDependencies"]).toBeUndefined();
+  for (const field of ["dependencies", "peerDependencies", "optionalDependencies", "bundleDependencies", "bundledDependencies"]) expect(manifest[field], field).toBeUndefined();
+  expect(manifest["scripts"]).toEqual({ typecheck: "tsc --noEmit", test: "vitest run" });
   expect(manifest["keywords"]).toEqual(["pi-package"]);
   expect(manifest["pi"]).toEqual({ skills: ["./skills"], prompts: ["./prompts"] });
   expect(readdirSync(ROOT)).not.toContain("extensions");
