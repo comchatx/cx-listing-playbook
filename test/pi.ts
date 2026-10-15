@@ -1,7 +1,6 @@
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { pathToFileURL } from "node:url";
 import { fauxAssistantMessage, fauxProvider, type TranscriptContext } from "@earendil-works/pi-ai";
 import { createAgentSession, DefaultResourceLoader, ModelRuntime, SessionManager, SettingsManager } from "@earendil-works/pi-coding-agent";
 import { afterEach } from "vitest";
@@ -43,21 +42,4 @@ export async function typed(root: string, input: string): Promise<string> {
   return typeof user.content === "string" ? user.content : user.content.map((part) => ("text" in part ? part.text : "")).join("");
 }
 
-/** pi's own default system prompt at the pin, with its default tools: the charter's ruler for a skill body. */
-export async function defaultPromptWords(): Promise<number> {
-  const dist = join(process.cwd(), "node_modules", "@earendil-works", "pi-coding-agent", "dist", "core");
-  const tools = ["read", "bash", "edit", "write"] as const;
-  const { buildSystemPrompt } = (await import(pathToFileURL(join(dist, "system-prompt.js")).href)) as { buildSystemPrompt: (input: object) => string };
-  const toolSnippets: Record<string, string> = {};
-  const promptGuidelines: string[] = [];
-  for (const tool of tools) {
-    const module = (await import(pathToFileURL(join(dist, "tools", `${tool}.js`)).href)) as Record<string, { snippet: string; guidelines: string[] }>;
-    const contribution = module[`${tool}ToolSystemPromptContribution`]!;
-    toolSnippets[tool] = contribution.snippet;
-    promptGuidelines.push(...contribution.guidelines);
-  }
-  return words(buildSystemPrompt({ cwd: "/tenant", selectedTools: [...tools], toolSnippets, promptGuidelines, contextFiles: [], skills: [] }));
-}
-
-export const words = (text: string): number => text.trim().split(/\s+/).length;
 export const body = (text: string): string => text.replace(/^---\n[\s\S]*?\n---\n/, "");

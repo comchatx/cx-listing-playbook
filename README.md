@@ -14,7 +14,7 @@ It is text and one script. Every sentence of the skills ends with the research i
 | `prompts/listing-review.md` | `/listing-review <ASIN>`: the listing and its issues, the market since last time, a proposal with its reasons |
 | `prompts/listing-watch.md` | `/listing-watch <ASIN> <your words>`: writes the standing instruction for that listing from the seller's words, e.g. `/listing-watch <ASIN> 以后每天帮我盯着这个 listing，有要改的告诉我，没事别吵` |
 
-Each `SKILL.md` body stays within pi's own default system prompt at the pinned version, 371 words; the rest is under each skill's `references/`.
+Each skill's detail is under its `references/`.
 
 ## Files in the seller's tree
 

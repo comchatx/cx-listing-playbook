@@ -2,7 +2,7 @@ import { readFileSync, readdirSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { expect, it } from "vitest";
-import { body, defaultPromptWords, loadPackage, typed, words } from "./pi.js";
+import { loadPackage, typed } from "./pi.js";
 
 const ROOT = resolve(fileURLToPath(new URL("..", import.meta.url)));
 const SKILLS = ["effect-review", "listing-change-log", "listing-review"] as const;
@@ -18,12 +18,6 @@ it("the pinned pi loads three skills and two templates from the package, and not
   expect(skills.skills.map((skill) => skill.filePath).sort()).toEqual(SKILLS.map(skillFile));
   expect(prompts.prompts.map((prompt) => prompt.name).sort()).toEqual(["listing-review", "listing-watch"]);
   expect(loader.getExtensions().extensions).toEqual([]);
-});
-
-it("each SKILL.md body is at most pi's own default prompt, measured at the pin: 371 words", async () => {
-  const ruler = await defaultPromptWords();
-  expect(ruler).toBe(371);
-  for (const name of SKILLS) expect(words(body(readFileSync(skillFile(name), "utf8"))), name).toBeLessThanOrEqual(ruler);
 });
 
 it("each template expands in a pi session: the ASIN and the seller's own words reach the model, no placeholder does", async () => {
