@@ -1,0 +1,82 @@
+[
+  {
+    "query": "we're about to change the title on B0C7X2KQ9L — write down the before and after and what we expect before I hit submit",
+    "should_trigger": true
+  },
+  {
+    "query": "记一笔：B09ZK3LM2P 五点今天改了，我说的是「按第三版来，广告别动」，提交后 Amazon 回了 ACCEPTED",
+    "should_trigger": true
+  },
+  {
+    "query": "Amazon returned submissionId 4f2a... status ACCEPTED for the search terms patch on SKU YM-PURPLE; update the change record",
+    "should_trigger": true
+  },
+  {
+    "query": "before we patch the bullet points, log what we're betting on: which search terms should gain impression share and by how much",
+    "should_trigger": true
+  },
+  {
+    "query": "keep a record of every listing edit we make on the blanket ASINs — what changed, why, what amazon said back",
+    "should_trigger": true
+  },
+  {
+    "query": "the price change and the image swap went out together on B08Q7RZ1MN yesterday; how should that be written up in our change history?",
+    "should_trigger": true
+  },
+  {
+    "query": "save the request body we're about to send to the listings API for the title change so we have it on file, plus the seller's sign-off",
+    "should_trigger": true
+  },
+  {
+    "query": "Amazon rejected my patch with issues — 'value exceeds maxLength'. note it in the log for that change and what happens next",
+    "should_trigger": true
+  },
+  {
+    "query": "我们上周改了主图，变更记录里要写观察窗口从哪天开始到哪天结束",
+    "should_trigger": true
+  },
+  {
+    "query": "set the observation window end date in the change file for the B0FIXTURE title change",
+    "should_trigger": true
+  },
+  {
+    "query": "what's a good title for a bamboo cutting board listing?",
+    "should_trigger": false
+  },
+  {
+    "query": "pull the Sales and Traffic report for last month",
+    "should_trigger": false
+  },
+  {
+    "query": "git log shows a lot of changes, write a CHANGELOG.md for my npm package release",
+    "should_trigger": false
+  },
+  {
+    "query": "our Sponsored Brands campaign bids went up 20% last week, why is ACOS higher",
+    "should_trigger": false
+  },
+  {
+    "query": "帮我写一封邮件给亚马逊卖家支持，问为什么我的 listing 被下架",
+    "should_trigger": false
+  },
+  {
+    "query": "how many characters can amazon bullet points be in the US marketplace?",
+    "should_trigger": false
+  },
+  {
+    "query": "compare the main image of my listing with the top 3 competitors",
+    "should_trigger": false
+  },
+  {
+    "query": "track Jira ticket changes for our sprint",
+    "should_trigger": false
+  },
+  {
+    "query": "our Shopify store theme changes need a changelog for the team",
+    "should_trigger": false
+  },
+  {
+    "query": "is the Buy Box suppressed on my ASIN right now?",
+    "should_trigger": false
+  }
+]

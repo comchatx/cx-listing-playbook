@@ -1,0 +1,82 @@
+[
+  {
+    "query": "my amazon listing B0C7X2KQ9L has had sessions flat for a month but conversion dropped from 12% to 8%, can you go through the listing and tell me what's off?",
+    "should_trigger": true
+  },
+  {
+    "query": "帮我看看 B09ZK3LM2P 这个 listing 最近表现怎么样，标题五点要不要优化",
+    "should_trigger": true
+  },
+  {
+    "query": "Is my title for the yoga mat too long for Amazon? here it is: 'ProFlex Yoga Mat Extra Thick 1/2 Inch Non Slip Exercise Mat for Home Workout Pilates Stretching with Carrying Strap, Purple' ",
+    "should_trigger": true
+  },
+  {
+    "query": "Amazon shows a different title on my product page than what I submitted in Seller Central. why does that happen and does it hurt me?",
+    "should_trigger": true
+  },
+  {
+    "query": "we lost the buy box on our best seller yesterday and orders are tanking — is it the listing or something else? check the sp-api data",
+    "should_trigger": true
+  },
+  {
+    "query": "my listing got suppressed for a missing attribute, what does the issues array from getListingsItem actually mean and how do i validate a fix before submitting",
+    "should_trigger": true
+  },
+  {
+    "query": "which report should I pull to see impression share by search term for my ASIN? I want to know whether the listing is getting seen for 'cast iron skillet'",
+    "should_trigger": true
+  },
+  {
+    "query": "我的 listing 关键词 search terms 字段是不是写满了？帮我数一下字节",
+    "should_trigger": true
+  },
+  {
+    "query": "Our competitor B0COMPXYZ just changed their main image and price; take a look at our listing vs theirs and suggest what we should change",
+    "should_trigger": true
+  },
+  {
+    "query": "Review listing B08Q7RZ1MN for me: how it's doing, any issues, what you'd change",
+    "should_trigger": true
+  },
+  {
+    "query": "How do I set up a Sponsored Products auto campaign with a $20 daily budget?",
+    "should_trigger": false
+  },
+  {
+    "query": "calculate my FBA fees for a 2.3 lb item 12x9x4 inches",
+    "should_trigger": false
+  },
+  {
+    "query": "write me a shopify product description for a scented candle, warm and cozy tone",
+    "should_trigger": false
+  },
+  {
+    "query": "create an inbound shipment plan for 500 units to FBA",
+    "should_trigger": false
+  },
+  {
+    "query": "帮我查一下这个 ASIN 的 Keepa 价格历史，过去 90 天最低价是多少",
+    "should_trigger": false
+  },
+  {
+    "query": "the change I made to the bullets on B07XYZ two weeks ago — did it actually work? the observation window just ended",
+    "should_trigger": false
+  },
+  {
+    "query": "respond to this negative review politely: 'blanket shed everywhere, returning'",
+    "should_trigger": false
+  },
+  {
+    "query": "what's the difference between a vendor and a seller account on amazon for wholesale?",
+    "should_trigger": false
+  },
+  {
+    "query": "design an A+ content module layout with comparison chart for our blender line",
+    "should_trigger": false
+  },
+  {
+    "query": "draft an email to our supplier asking for a lower MOQ on the sherpa blankets",
+    "should_trigger": false
+  }
+]

@@ -1,0 +1,42 @@
+{
+  "skill_name": "listing-change-log",
+  "evals": [
+    {
+      "id": 3,
+      "name": "log-before-bullets-write",
+      "prompt": "B0FIXTURE4 的五点按我们定的新版本改，先记一笔再提交。新五点：1. QUEEN SIZE 90 x 90: fits a queen bed with a short drop on each side. 2. SHERPA + FLANNEL: reversible, sherpa side for cold nights, flannel side for spring. 3. WARM, NOT HEAVY: 2.9 lb, no static. 4. EASY CARE: machine wash cold, tumble dry low, no shedding after the first wash. 5. GIFT BOX: arrives in a ribbon box. 我的原话：「就按第二版改，广告出价先别动，两周后看效果」",
+      "expected_output": "Writes one change file under the tree's listings/B0FIXTURE4/changes/ holding before (from the landed getListingsItem), after, expected range with its condition and the file the figure comes from, the words bet on from Search Query Performance with baseline shares, the seller's words verbatim, the request as it would be sent (origin, method, path, body), the receipt (pending or refused), and the window dates; the stub refuses the write, which the record or reply states.",
+      "files": [],
+      "expectations": [
+        "A change file exists under tenant/listings/B0FIXTURE4/changes/.",
+        "The change file holds the current (before) bullets, taken from the landed getListingsItem file.",
+        "The change file holds the five new bullets as the after.",
+        "The change file quotes the seller's words verbatim: 就按第二版改，广告出价先别动，两周后看效果.",
+        "The change file records holding ad bids fixed as part of the seller's decision.",
+        "The change file states an expected effect with a metric, a direction or range, and the data source it will be read from.",
+        "The change file names words bet on, with their baseline share taken from the landed Search Query Performance documents.",
+        "The change file holds the request as it would be sent: method PATCH, path /listings/2021-08-01/items/A1FIXTURESELLER/HL-SHERPA-Q, marketplaceIds, and a body replacing bullet_point.",
+        "The change file has baseline and observation window dates (or says the observation opens when the change shows).",
+        "The answer or record flags 'no static' and 'no shedding after the first wash' as claims that need proof.",
+        "The baseline weeks recorded leave out the sale's early deals (2026-09-30 onward) and the event week.",
+        "The seller's 'log then submit' is carried out: the PATCH is sent and its refusal recorded, or the answer says plainly it was not sent and gives the reason."
+      ]
+    },
+    {
+      "id": 4,
+      "name": "receipt-update",
+      "prompt": "Amazon came back on the B0FIXTURE7 search terms patch: submissionId 9c0d-fixture-1014, status ACCEPTED, no issues. Update the record.",
+      "expected_output": "Updates the existing change file with the receipt; says ACCEPTED is accepted for processing, not live; says when the observation window opens (getListingsItem holding the new value with no ERROR issue; the Catalog does not return search terms).",
+      "files": [],
+      "expectations": [
+        "The existing change file tenant/listings/B0FIXTURE7/changes/2026-10-13-search-terms.md is updated (not a new unrelated file) with submissionId 9c0d-fixture-1014 and status ACCEPTED and no issues.",
+        "The answer or file says ACCEPTED means accepted for processing, not that the change is live.",
+        "The answer or file says how to tell the change is live (getListingsItem showing the new generic_keyword without ERROR issues).",
+        "The answer or file notes the Catalog / product page does not show search terms, so the check is through the Listings API.",
+        "The observation window's start is tied to the change showing, not to the submission date.",
+        "The rest of the change file (before, after, seller's words, request) is preserved.",
+        "The answer or record says Amazon can still raise issues after ACCEPTED."
+      ]
+    }
+  ]
+}

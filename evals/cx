@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+# The skill-creator runs' stand-in for the box's cx: GETs are answered from the fixture's own landed replies; writes are refused.
+# Calls are logged to $TENANT_TREE/../cx-calls.log.
+set -uo pipefail
+T="${TENANT_TREE:?TENANT_TREE is the seller tree}"
+echo "cx $*" >>"$T/../cx-calls.log"
+[ "${1-}" = raw ] || { echo "stub cx: this run has only 'cx raw <source> ...'" >&2; exit 2; }
+src="${2-}"; shift 2
+method=GET path='' output='' json=0
+while [ $# -gt 0 ]; do case "$1" in
+  --method) method="$2"; shift 2;; --path) path="$2"; shift 2;; --output) output="$2"; shift 2;; --json) json=1; shift;;
+  --origin|--query|--header|--body) shift 2;; *) shift;; esac; done
+refuse() { echo "{\"request_id\":\"stub\",\"paths\":[],\"cost\":[],\"refusal\":{\"reason\":\"$1\",\"detail\":\"$2\"}}"; exit 2; }
+[ "$src" = amazon-sp-api ] || refuse out_of_scope "stub: only amazon-sp-api in this run"
+[ "$method" = GET ] || refuse out_of_scope "stub: this run sends no write to Amazon"
+R="$T/raw/amazon-sp-api"; id="${path##*/}"
+case "$path" in
+  /listings/2021-08-01/items/*) f=$(ls -t "$R"/getListingsItem-"$id"-*.json 2>/dev/null | head -1) ;;
+  /catalog/2022-04-01/items/*) f=$(ls -t "$R"/getCatalogItem-"$id"-*.json 2>/dev/null | head -1) ;;
+  /products/pricing/v0/items/*/offers) a="${path#/products/pricing/v0/items/}"; a="${a%/offers}"; f=$(ls -t "$R"/getItemOffers-"$a"-*.json 2>/dev/null | head -1) ;;
+  /definitions/2020-09-01/productTypes/*) f=$(ls -t "$R"/getDefinitionsProductType-"$id"-*.json 2>/dev/null | head -1) ;;
+  *) f='' ;;
+esac
+[ -n "$output" ] || output="$R/stub-$(date +%s%N)-${id}.json"
+[ ! -e "$output" ] || refuse out_of_scope "the file is already there"
+[ -d "$(dirname "$output")" ] || refuse out_of_scope "no such directory"
+if [ -z "$f" ]; then echo '{"errors":[{"code":"NotFound","message":"stub: no fixture for this path"}]}' >"$output"; st=404; kind=failed; code=1
+else cp "$f" "$output"; st=200; kind=fresh; code=0; fi
+[ $json -eq 1 ] && echo "{\"request_id\":\"stub\",\"paths\":[{\"path\":\"$path\",\"http_status\":$st,\"outcome\":{\"kind\":\"$kind\"},\"file\":\"$output\"}],\"cost\":[]}" || echo "$output"
+exit $code

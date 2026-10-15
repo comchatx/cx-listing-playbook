@@ -1,0 +1,66 @@
+#!/usr/bin/env bash
+# A stand-in for the box's `cx`, only as far as `cx raw amazon-sp-api ... --output <file> --json` goes.
+# It answers from the scenario directory $STUB: each call is appended to $STUB/calls.log as "METHOD PATH QUERY...";
+# GET /reports/2021-06-30/reports answers $STUB/reports.json, POST answers $STUB/create.json, a report id answers
+# the next line of $STUB/statuses (the last line repeats) and a document id answers $STUB/document.json. With a file
+# $STUB/create-ids, POST answers the next id in it (the last line repeats).
+# A file $STUB/fail-<n> makes the n-th call fail as cx reports a 429; $STUB/refuse-<n> makes cx refuse it, with no reply. A file $STUB/cut-document makes getReportDocument
+# end as cx reports a 2xx reply that broke off: the bytes that came, through the link, land and the call fails.
+set -euo pipefail
+[ "$1 $2" = "raw amazon-sp-api" ] || { echo "stub cx: only raw amazon-sp-api" >&2; exit 2; }
+shift 2
+method='' path='' output='' query=()
+while [ $# -gt 0 ]; do
+  case "$1" in
+    --origin|--header|--body) shift 2 ;;
+    --method) method="$2"; shift 2 ;;
+    --path) path="$2"; shift 2 ;;
+    --query) query+=("$2"); shift 2 ;;
+    --output) output="$2"; shift 2 ;;
+    --json) shift ;;
+    *) echo "stub cx: unknown flag $1" >&2; exit 2 ;;
+  esac
+done
+[ ! -e "$output" ] || { echo '{"refusal":{"reason":"out_of_scope","detail":"the file is already there"},"paths":[],"cost":[]}'; exit 2; }
+line="$method $path"; [ ${#query[@]} -eq 0 ] || line+=" ${query[*]}"
+echo "$line" >>"$STUB/calls.log"
+n=$(wc -l <"$STUB/calls.log" | tr -d ' ')
+
+receipt() { printf '{"request_id":"stub-%s","paths":[{"path":"%s","origin":"https://sellingpartnerapi-na.amazon.com","http_status":%s,"outcome":{"kind":"%s"},"file":"%s"}],"cost":[]}\n' "$n" "$path" "$1" "$2" "$output"; }
+
+if [ -e "$STUB/refuse-$n" ]; then
+  echo '{"refusal":{"reason":"out_of_scope","detail":"stub refusal"},"paths":[],"cost":[]}'
+  exit 2
+fi
+
+if [ -e "$STUB/fail-$n" ]; then
+  echo '{"errors":[{"code":"QuotaExceeded","message":"You exceeded your quota for the requested resource."}]}' >"$output"
+  receipt 429 failed
+  exit 1
+fi
+
+case "$method $path" in
+  "GET /reports/2021-06-30/reports") cp "$STUB/reports.json" "$output" ;;
+  "POST /reports/2021-06-30/reports")
+    if [ -e "$STUB/create-ids" ]; then
+      jq -n --arg id "$(head -n 1 "$STUB/create-ids")" '{reportId: $id}' >"$output"
+      [ "$(wc -l <"$STUB/create-ids" | tr -d ' ')" -le 1 ] || sed -i.bak 1d "$STUB/create-ids"
+    else
+      cp "$STUB/create.json" "$output"
+    fi ;;
+  "GET /reports/2021-06-30/documents/"*)
+    if [ -e "$STUB/cut-document" ]; then
+      sed -E 's/("url":"[^"]*",).*/\1/' "$STUB/document.json" | tr -d '\n' >"$output"
+      receipt 200 failed
+      exit 1
+    fi
+    cp "$STUB/document.json" "$output" ;;
+  "GET /reports/2021-06-30/reports/"*)
+    id="${path##*/}"
+    status=$(head -n 1 "$STUB/statuses")
+    [ "$(wc -l <"$STUB/statuses" | tr -d ' ')" -le 1 ] || sed -i.bak 1d "$STUB/statuses"
+    jq -n --arg id "$id" --arg s "$status" '{reportId: $id, reportType: "STUB_REPORT", processingStatus: $s, createdTime: "2026-10-14T00:00:00+00:00",
+      marketplaceIds: ["ATVPDKIKX0DER"]} + (if $s == "DONE" or $s == "FATAL" then {reportDocumentId: "amzn1.spdoc.1.4.na.STUB", processingEndTime: "2026-10-14T00:05:00+00:00"} else {} end)' >"$output" ;;
+  *) echo '{"errors":[{"code":"NotFound"}]}' >"$output"; receipt 404 failed; exit 1 ;;
+esac
+receipt 200 fresh

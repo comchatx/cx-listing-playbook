@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+# In front of curl for the tests: each run is appended to $STUB/calls.log as "DOWNLOAD", and its arguments to
+# $STUB/curl.log with the link as <link> and the -o file by its name only.
+echo DOWNLOAD >>"$STUB/calls.log"
+seen=() prev='' i=0
+for arg in "$@"; do
+  i=$((i + 1)); shown="$arg"
+  if [ "$i" -eq $# ]; then shown='<link>'; elif [ "$prev" = -o ]; then shown="${arg##*/}"; fi
+  seen+=("$shown"); prev="$arg"
+done
+printf '%s\n' "${seen[*]}" >>"$STUB/curl.log"
+here=$(cd "$(dirname "$0")" && pwd)
+PATH=$(printf '%s' "$PATH" | tr ':' '\n' | grep -vx "$here" | paste -sd: -) exec curl "$@"
