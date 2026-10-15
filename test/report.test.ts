@@ -12,13 +12,14 @@ const STUB = join(ROOT, "test", "stub");
 const TYPE = "STUB_REPORT";
 const ASK = ["--origin", "https://sellingpartnerapi-na.amazon.com", "--marketplace", "ATVPDKIKX0DER", "--start", "2026-10-04T00:00:00Z", "--end", "2026-10-10T23:59:59Z"];
 const DOCUMENT = "sku\tasin\tstatus\n<SKU>\t<ASIN>\tActive\n";
+const CREATED = "2026-10-14T00:00:00+00:00";
 const JSON_DOCUMENT = '{"reportSpecification":{"reportType":"GET_SALES_AND_TRAFFIC_REPORT"},"salesAndTrafficByAsin":[]}\n';
 
 const scratches: string[] = [];
 afterEach(() => { for (const scratch of scratches.splice(0)) rmSync(scratch, { recursive: true, force: true }); });
 
 /** A scenario for the stub `cx`: Amazon's replies in order, and a tree for the script to land in. */
-function world(options: { readonly statuses: readonly string[]; readonly reports?: readonly object[]; readonly gzip?: boolean; readonly document?: string; readonly failOn?: readonly number[]; readonly refuseOn?: readonly number[]; readonly cutDocument?: boolean }) {
+function world(options: { readonly statuses: readonly string[]; readonly reports?: readonly object[]; readonly gzip?: boolean; readonly document?: string; readonly failOn?: readonly number[]; readonly refuseOn?: readonly number[]; readonly cutDocument?: boolean; readonly createIds?: readonly string[] }) {
   const root = mkdtempSync(join(tmpdir(), "report-sh-"));
   scratches.push(root);
   const stub = join(root, "stub");
@@ -37,20 +38,26 @@ function world(options: { readonly statuses: readonly string[]; readonly reports
   for (const n of options.failOn ?? []) writeFileSync(join(stub, `fail-${n}`), "");
   for (const n of options.refuseOn ?? []) writeFileSync(join(stub, `refuse-${n}`), "");
   if (options.cutDocument === true) writeFileSync(join(stub, "cut-document"), "");
-  const runAs = (type: string, ...args: string[]) => {
-    const done = spawnSync("bash", [SCRIPT, type, ...ASK, ...args], { encoding: "utf8", timeout: 20_000, env: { ...process.env, PATH: `${STUB}:${process.env["PATH"]}`, STUB: stub, TENANT_TREE: tree } });
+  if (options.createIds !== undefined) writeFileSync(join(stub, "create-ids"), `${options.createIds.join("\n")}\n`);
+  /** report.sh with exactly these arguments. */
+  const exec = (...args: string[]) => {
+    const done = spawnSync("bash", [SCRIPT, ...args], { encoding: "utf8", timeout: 20_000, env: { ...process.env, PATH: `${STUB}:${process.env["PATH"]}`, STUB: stub, TENANT_TREE: tree } });
     return { exit: done.status, out: done.stdout.trim(), err: done.stderr.trim() };
   };
+  const runAs = (type: string, ...args: string[]) => exec(type, ...ASK, ...args);
   const run = (...args: string[]) => runAs(TYPE, ...args);
   const calls = () => readFileSync(join(stub, "calls.log"), "utf8").trim().split("\n").filter(Boolean);
+  /** The ask's directory: the only one under the type's. */
   const askDir = () => { const parent = join(tree, "reports", TYPE); return join(parent, readdirSync(parent)[0]!); };
-  const receipt = () => JSON.parse(readFileSync(join(askDir(), "receipt.json"), "utf8")) as Record<string, unknown>;
+  /** The ask's n-th report. */
+  const place = (n = 1) => join(askDir(), String(n));
+  const receipt = (n = 1) => JSON.parse(readFileSync(join(place(n), "receipt.json"), "utf8")) as Record<string, unknown>;
   const link = `file://${download}`;
   /** Every file under the tree that holds the document's link. */
   const holdingLink = () => (readdirSync(tree, { recursive: true }) as string[]).map((file) => join(tree, file)).filter((file) => statSync(file).isFile() && readFileSync(file, "utf8").includes(link));
   /** Everything under the scenario's root, the stub's own files and the tree alike. */
   const listing = () => (readdirSync(root, { recursive: true }) as string[]).map((file) => file.split(sep).join("/")).sort();
-  return { run, runAs, calls, askDir, receipt, tree, stub, download, link, holdingLink, listing };
+  return { exec, run, runAs, calls, askDir, place, receipt, tree, stub, download, link, holdingLink, listing };
 }
 
 it("creates, polls to DONE, lands the decompressed document beside a receipt with the report id and Amazon's status, and never prints the link", () => {
@@ -65,16 +72,16 @@ it("creates, polls to DONE, lands the decompressed document beside a receipt wit
     "GET /reports/2021-06-30/documents/amzn1.spdoc.1.4.na.STUB",
     "DOWNLOAD",
   ]);
-  expect(readFileSync(join(w.askDir(), "report.txt"), "utf8")).toBe(DOCUMENT);
+  expect(readFileSync(join(w.place(), "report.txt"), "utf8")).toBe(DOCUMENT);
   expect(w.receipt()).toMatchObject({ reportId: "50001", processingStatus: "DONE", source: "createReport", document: "report.txt", compressionAlgorithm: "GZIP", ask: { reportType: TYPE, marketplaceIds: ["ATVPDKIKX0DER"] } });
-  expect(got.out).toBe(`DONE 50001 ${join(w.askDir(), "report.txt")}`);
-  expect(JSON.parse(readFileSync(join(w.askDir(), "create-body.json"), "utf8"))).toEqual({ reportType: TYPE, marketplaceIds: ["ATVPDKIKX0DER"], dataStartTime: "2026-10-04T00:00:00Z", dataEndTime: "2026-10-10T23:59:59Z" });
+  expect(got.out).toBe(`DONE 50001 created ${CREATED} ${join(w.place(), "report.txt")}`);
+  expect(JSON.parse(readFileSync(join(w.place(), "create-body.json"), "utf8"))).toEqual({ reportType: TYPE, marketplaceIds: ["ATVPDKIKX0DER"], dataStartTime: "2026-10-04T00:00:00Z", dataEndTime: "2026-10-10T23:59:59Z" });
   expect(`${got.out}${got.err}`).not.toContain("file://");
   expect(w.holdingLink()).toEqual([]);
   const ask = relative(w.tree, w.askDir()).split(sep).join("/");
   expect(w.listing()).toEqual([
-    "document.tsv.gz", "stub", "stub/calls.log", "stub/create.json", "stub/document.json", "stub/reports.json", "stub/statuses", "stub/statuses.bak", "tenant", "tenant/reports", "tenant/reports/STUB_REPORT", `tenant/${ask}`,
-    ...["create-1.cx.json", "create-1.json", "create-body.json", "document-1.cx.json", "document-1.json", "receipt.json", "report-1.cx.json", "report-1.json", "report-2.cx.json", "report-2.json", "report-3.cx.json", "report-3.json", "report.txt"].map((file) => `tenant/${ask}/${file}`),
+    "document.tsv.gz", "stub", "stub/calls.log", "stub/create.json", "stub/document.json", "stub/reports.json", "stub/statuses", "stub/statuses.bak", "tenant", "tenant/reports", "tenant/reports/STUB_REPORT", `tenant/${ask}`, `tenant/${ask}/1`,
+    ...["create-1.cx.json", "create-1.json", "create-body.json", "document-1.cx.json", "document-1.json", "receipt.json", "report-1.cx.json", "report-1.json", "report-2.cx.json", "report-2.json", "report-3.cx.json", "report-3.json", "report.txt"].map((file) => `tenant/${ask}/1/${file}`),
   ].sort());
 });
 
@@ -93,9 +100,9 @@ it("a report type outside capitals, digits and _ is refused before any call and 
 it("a JSON document lands as report.json beside the getReportDocument reply, which keeps all but the link", () => {
   const w = world({ statuses: ["DONE"], document: JSON_DOCUMENT });
   const got = w.run("--wait", "0");
-  expect(got).toMatchObject({ exit: 0, out: `DONE 50001 ${join(w.askDir(), "report.json")}` });
-  expect(readFileSync(join(w.askDir(), "report.json"), "utf8")).toBe(JSON_DOCUMENT);
-  expect(JSON.parse(readFileSync(join(w.askDir(), "document-1.json"), "utf8"))).toEqual({ reportDocumentId: "amzn1.spdoc.1.4.na.STUB", compressionAlgorithm: "GZIP" });
+  expect(got).toMatchObject({ exit: 0, out: `DONE 50001 created ${CREATED} ${join(w.place(), "report.json")}` });
+  expect(readFileSync(join(w.place(), "report.json"), "utf8")).toBe(JSON_DOCUMENT);
+  expect(JSON.parse(readFileSync(join(w.place(), "document-1.json"), "utf8"))).toEqual({ reportDocumentId: "amzn1.spdoc.1.4.na.STUB", compressionAlgorithm: "GZIP" });
   expect(w.receipt()).toMatchObject({ document: "report.json" });
 });
 
@@ -104,7 +111,7 @@ it("a getReportDocument reply cut short after its link ends the run failed, and 
   const got = w.run("--wait", "0");
   expect(got.exit).toBe(1);
   expect(w.calls().at(-1)).toBe("GET /reports/2021-06-30/documents/amzn1.spdoc.1.4.na.STUB");
-  expect(readFileSync(join(w.askDir(), "document-1.json"), "utf8")).toContain("amzn1.spdoc.1.4.na.STUB");
+  expect(readFileSync(join(w.place(), "document-1.json"), "utf8")).toContain("amzn1.spdoc.1.4.na.STUB");
   expect(`${got.out}${got.err}`).not.toContain("file://");
   expect(w.holdingLink()).toEqual([]);
   rmSync(join(w.stub, "cut-document"));
@@ -120,21 +127,21 @@ it("a failed createReport is asked again by the next run, and cx's receipt of th
   expect(first.exit).toBe(1);
   expect(w.calls().filter((call) => call.startsWith("POST"))).toHaveLength(1);
   const second = w.run("--wait", "0");
-  expect(second).toMatchObject({ exit: 0, out: `DONE 50001 ${join(w.askDir(), "report.txt")}` });
+  expect(second).toMatchObject({ exit: 0, out: `DONE 50001 created ${CREATED} ${join(w.place(), "report.txt")}` });
   expect(w.calls().filter((call) => call.startsWith("POST"))).toHaveLength(2);
   expect(w.calls().filter((call) => call === "DOWNLOAD")).toHaveLength(1);
-  expect(readFileSync(join(w.askDir(), "create-1.json"), "utf8")).toContain("QuotaExceeded");
-  expect(JSON.parse(readFileSync(join(w.askDir(), "create-1.cx.json"), "utf8"))).toMatchObject({ paths: [{ http_status: 429 }] });
-  expect(JSON.parse(readFileSync(join(w.askDir(), "create-2.json"), "utf8"))).toEqual({ reportId: "50001" });
+  expect(readFileSync(join(w.place(), "create-1.json"), "utf8")).toContain("QuotaExceeded");
+  expect(JSON.parse(readFileSync(join(w.place(), "create-1.cx.json"), "utf8"))).toMatchObject({ paths: [{ http_status: 429 }] });
+  expect(JSON.parse(readFileSync(join(w.place(), "create-2.json"), "utf8"))).toEqual({ reportId: "50001" });
 });
 
 it("a call cx refuses lands no reply; cx's refusal is kept and the next run asks under a name of its own", () => {
   const w = world({ statuses: ["DONE"], refuseOn: [1] });
   expect(w.run("--wait", "0").exit).toBe(1);
-  expect(existsSync(join(w.askDir(), "create-1.json"))).toBe(false);
+  expect(existsSync(join(w.place(), "create-1.json"))).toBe(false);
   expect(w.run("--wait", "0").exit).toBe(0);
-  expect(JSON.parse(readFileSync(join(w.askDir(), "create-1.cx.json"), "utf8"))).toMatchObject({ refusal: { reason: "out_of_scope" } });
-  expect(JSON.parse(readFileSync(join(w.askDir(), "create-2.json"), "utf8"))).toEqual({ reportId: "50001" });
+  expect(JSON.parse(readFileSync(join(w.place(), "create-1.cx.json"), "utf8"))).toMatchObject({ refusal: { reason: "out_of_scope" } });
+  expect(JSON.parse(readFileSync(join(w.place(), "create-2.json"), "utf8"))).toEqual({ reportId: "50001" });
 });
 
 it("a failed download is asked again by the next run, from getReportDocument, without polling a finished report again", () => {
@@ -149,9 +156,9 @@ it("a failed download is asked again by the next run, from getReportDocument, wi
   writeFileSync(w.download, bytes);
   const before = w.calls().length;
   const second = w.run("--wait", "0");
-  expect(second).toMatchObject({ exit: 0, out: `DONE 50001 ${join(w.askDir(), "report.txt")}` });
+  expect(second).toMatchObject({ exit: 0, out: `DONE 50001 created ${CREATED} ${join(w.place(), "report.txt")}` });
   expect(w.calls().slice(before)).toEqual(["GET /reports/2021-06-30/documents/amzn1.spdoc.1.4.na.STUB", "DOWNLOAD"]);
-  expect(readFileSync(join(w.askDir(), "report.txt"), "utf8")).toBe(DOCUMENT);
+  expect(readFileSync(join(w.place(), "report.txt"), "utf8")).toBe(DOCUMENT);
   expect(w.holdingLink()).toEqual([]);
 });
 
@@ -165,21 +172,36 @@ it("a flag that takes a value, given last without one, ends in the usage text be
   expect(w.calls()).toEqual([]);
 });
 
-it("a landed report of the same ask is read again with no call to Amazon", () => {
-  const w = world({ statuses: ["DONE"] });
-  expect(w.run("--wait", "0").exit).toBe(0);
-  const before = w.calls().length;
-  const again = w.run("--wait", "0");
-  expect(again.exit).toBe(0);
-  expect(again.out).toBe(`DONE 50001 ${join(w.askDir(), "report.txt")}`);
-  expect(w.calls()).toHaveLength(before);
+/** Every file of a report's directory, by name, with its bytes. */
+const files = (directory: string) => Object.fromEntries(readdirSync(directory).sort().map((name) => [name, readFileSync(join(directory, name))]));
+
+for (const [label, dates] of [["dated", ASK.slice(4)], ["open", []]] as const) {
+  it(`a second run of a landed ${label} ask makes its own createReport, and the first report's files stay byte for byte`, () => {
+    const w = world({ statuses: ["DONE"], createIds: ["50001", "50002"] });
+    const ask = [TYPE, ...ASK.slice(0, 4), ...dates, "--wait", "0"];
+    expect(w.exec(...ask)).toMatchObject({ exit: 0, out: `DONE 50001 created ${CREATED} ${join(w.place(1), "report.txt")}` });
+    const first = files(w.place(1));
+    const before = w.calls().length;
+    expect(w.exec(...ask)).toMatchObject({ exit: 0, out: `DONE 50002 created ${CREATED} ${join(w.place(2), "report.txt")}` });
+    expect(w.calls().slice(before)).toEqual(["POST /reports/2021-06-30/reports", "GET /reports/2021-06-30/reports/50002", "GET /reports/2021-06-30/documents/amzn1.spdoc.1.4.na.STUB", "DOWNLOAD"]);
+    expect(files(w.place(1))).toEqual(first);
+    expect(w.receipt(2)).toMatchObject({ reportId: "50002", createdTime: CREATED, document: "report.txt" });
+  });
+}
+
+it("the last line names Amazon's createdTime whatever the status", () => {
+  for (const status of ["DONE", "FATAL", "CANCELLED", "IN_QUEUE", "IN_PROGRESS"]) {
+    const w = world({ statuses: [status], gzip: false });
+    const got = w.run("--wait", "0");
+    expect(got.out.split(" ").slice(0, 4), status).toEqual([status, "50001", "created", CREATED]);
+  }
 });
 
 it("one wait: at the ceiling a queued report ends the run with its id and status, and the next run resumes that id instead of creating", () => {
   const w = world({ statuses: ["IN_QUEUE", "IN_QUEUE", "DONE"] });
   const first = w.run("--wait", "0");
   expect(first.exit).toBe(3);
-  expect(first.out).toBe(`IN_QUEUE 50001 since 2026-10-14T00:00:00+00:00 ${join(w.askDir(), "receipt.json")}`);
+  expect(first.out).toBe(`IN_QUEUE 50001 created ${CREATED} ${join(w.place(), "receipt.json")}`);
   expect(w.calls()).toEqual(["POST /reports/2021-06-30/reports", "GET /reports/2021-06-30/reports/50001"]);
   expect(w.receipt()).toMatchObject({ reportId: "50001", processingStatus: "IN_QUEUE" });
   const second = w.run("--wait", "5", "--every", "1");
@@ -200,17 +222,17 @@ it("an ask with report options puts them in the create body", () => {
   const w = world({ statuses: ["DONE"] });
   expect(w.run("--option", "reportPeriod=WEEK", "--option", "asin=<ASIN>", "--wait", "0").exit).toBe(0);
   expect(w.calls()[0]).toBe("POST /reports/2021-06-30/reports");
-  expect(JSON.parse(readFileSync(join(w.askDir(), "create-body.json"), "utf8"))).toMatchObject({ reportOptions: { reportPeriod: "WEEK", asin: "<ASIN>" } });
+  expect(JSON.parse(readFileSync(join(w.place(), "create-body.json"), "utf8"))).toMatchObject({ reportOptions: { reportPeriod: "WEEK", asin: "<ASIN>" } });
 });
 
 it("CANCELLED ends with no document; FATAL's document lands as Amazon's explanation, not as the report", () => {
   const cancelled = world({ statuses: ["CANCELLED"] });
-  expect(cancelled.run("--wait", "0")).toMatchObject({ exit: 0, out: "CANCELLED 50001" });
-  expect(existsSync(join(cancelled.askDir(), "report.txt"))).toBe(false);
+  expect(cancelled.run("--wait", "0")).toMatchObject({ exit: 0, out: `CANCELLED 50001 created ${CREATED}` });
+  expect(existsSync(join(cancelled.place(), "report.txt"))).toBe(false);
   const fatal = world({ statuses: ["FATAL"], gzip: false });
   expect(fatal.run("--wait", "0").exit).toBe(0);
   expect(fatal.receipt()).toMatchObject({ processingStatus: "FATAL", document: "fatal-explanation.txt" });
-  expect(existsSync(join(fatal.askDir(), "report.txt"))).toBe(false);
+  expect(existsSync(join(fatal.place(), "report.txt"))).toBe(false);
 });
 
 it("a call cx reports as failed (a 429) ends the run at once: no retry, no limiter, Amazon's words kept", () => {
@@ -219,7 +241,7 @@ it("a call cx reports as failed (a 429) ends the run at once: no retry, no limit
   expect(got.exit).toBe(1);
   expect(w.calls()).toHaveLength(2);
   expect(got.out).toContain("http_status\":429");
-  expect(readFileSync(join(w.askDir(), "report-1.json"), "utf8")).toContain("QuotaExceeded");
+  expect(readFileSync(join(w.place(), "report-1.json"), "utf8")).toContain("QuotaExceeded");
   const resumed = w.run("--wait", "5", "--every", "1");
   expect(resumed.exit).toBe(0);
   expect(w.calls().filter((call) => call.startsWith("POST"))).toHaveLength(1);

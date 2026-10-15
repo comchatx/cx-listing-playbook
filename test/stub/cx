@@ -2,7 +2,8 @@
 # A stand-in for the box's `cx`, only as far as `cx raw amazon-sp-api ... --output <file> --json` goes.
 # It answers from the scenario directory $STUB: each call is appended to $STUB/calls.log as "METHOD PATH QUERY...";
 # GET /reports/2021-06-30/reports answers $STUB/reports.json, POST answers $STUB/create.json, a report id answers
-# the next line of $STUB/statuses (the last line repeats) and a document id answers $STUB/document.json.
+# the next line of $STUB/statuses (the last line repeats) and a document id answers $STUB/document.json. With a file
+# $STUB/create-ids, POST answers the next id in it (the last line repeats).
 # A file $STUB/fail-<n> makes the n-th call fail as cx reports a 429; $STUB/refuse-<n> makes cx refuse it, with no reply. A file $STUB/cut-document makes getReportDocument
 # end as cx reports a 2xx reply that broke off: the bytes that came, through the link, land and the call fails.
 set -euo pipefail
@@ -40,7 +41,13 @@ fi
 
 case "$method $path" in
   "GET /reports/2021-06-30/reports") cp "$STUB/reports.json" "$output" ;;
-  "POST /reports/2021-06-30/reports") cp "$STUB/create.json" "$output" ;;
+  "POST /reports/2021-06-30/reports")
+    if [ -e "$STUB/create-ids" ]; then
+      jq -n --arg id "$(head -n 1 "$STUB/create-ids")" '{reportId: $id}' >"$output"
+      [ "$(wc -l <"$STUB/create-ids" | tr -d ' ')" -le 1 ] || sed -i.bak 1d "$STUB/create-ids"
+    else
+      cp "$STUB/create.json" "$output"
+    fi ;;
   "GET /reports/2021-06-30/documents/"*)
     if [ -e "$STUB/cut-document" ]; then
       sed -E 's/("url":"[^"]*",).*/\1/' "$STUB/document.json" | tr -d '\n' >"$output"

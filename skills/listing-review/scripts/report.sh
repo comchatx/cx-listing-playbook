@@ -5,12 +5,13 @@
 #             [--option <name>=<value>]... --wait <seconds> [--every <seconds>]
 #
 # Every call goes through `cx raw amazon-sp-api` but one: the document's download, which curl makes from the link
-# getReportDocument returns; the link is used once and never printed or kept. The ask lands in
-# <tree>/reports/<reportType>/<ask>/ with receipt.json (the report id and Amazon's processingStatus), each reply as
-# Amazon gave it under a name of its own, and the document as report.<ext>. A landed receipt of the same ask is read
-# instead of creating again; otherwise the ask creates its own report. A run picks up where the last one stopped, so
-# a failed create or download is asked again by the next run. One wait, its ceiling --wait: a report still queued
-# then ends the run with its id and status (exit 3), and the next run resumes that id. No limiter and no retry of its own.
+# getReportDocument returns; the link is used once and never printed or kept. Each run asks Amazon for a report of its
+# own, except that it carries on the ask's report not yet landed: one unfinished at Amazon, one whose create failed, or
+# one finished but not downloaded. Each report lands in <tree>/reports/<reportType>/<ask>/<n>/ with receipt.json (the
+# report id, Amazon's processingStatus and createdTime), each reply as Amazon gave it under a name of its own, and the
+# document as report.<ext>; a later run leaves earlier reports as they are. One wait, its ceiling --wait: a report
+# still queued then ends the run with its id and status (exit 3), and the next run carries it on. The last line names
+# the status, the id and Amazon's createdTime. No limiter and no retry of its own.
 # Exit: 0 Amazon's terminal status (DONE, CANCELLED, FATAL); 1 a call or the download failed; 2 usage; 3 still queued.
 set -uo pipefail
 
@@ -48,9 +49,24 @@ ask=$(jq -nS --arg origin "$origin" --arg type "$type" --arg m "$marketplaces" -
     dataStartTime: (if $start == "" then null else $start end), dataEndTime: (if $stop == "" then null else $stop end),
     reportOptions: ($ARGS.positional | map(capture("^(?<k>[^=]+)=(?<v>.*)$") | {(.k): .v}) | add)}' "${options[@]+"${options[@]}"}") || usage
 key="${marketplaces//,/+}_${start:-open}_${end:-open}_$(printf '%s' "$ask" | cksum | cut -d' ' -f1)"
-dir="$TREE/reports/$type/${key//[:\/]/-}"
+askdir="$TREE/reports/$type/${key//[:\/]/-}"
+mkdir -p "$askdir" || exit 1
+
+terminal() { case "$1" in DONE|CANCELLED|FATAL) return 0 ;; *) return 1 ;; esac; }
+landed() { # landed <receipt>: Amazon finished the report and nothing of it is left to fetch
+  local status
+  [ -f "$1" ] || return 1
+  status=$(jq -r '.processingStatus // ""' "$1")
+  terminal "$status" && { [ "$status" = CANCELLED ] || [ -n "$(jq -r '.document // empty' "$1")" ] || [ -z "$(jq -r '.reportDocumentId // ""' "$1")" ]; }
+}
+
+n=1; while [ -e "$askdir/$n" ]; do n=$((n + 1)); done
+if [ "$n" -gt 1 ] && ! landed "$askdir/$((n - 1))/receipt.json"; then
+  dir="$askdir/$((n - 1))"
+else
+  dir="$askdir/$n"; mkdir "$dir" || exit 1
+fi
 receipt="$dir/receipt.json"
-mkdir -p "$dir" || exit 1
 
 now() { date -u +%Y-%m-%dT%H:%M:%SZ; }
 next() { local n=1; while [ -e "$dir/$1-$n.json" ] || [ -e "$dir/$1-$n.cx.json" ]; do n=$((n + 1)); done; printf '%s-%s' "$1" "$n"; }
@@ -73,17 +89,16 @@ record() { # record <jq filter> [jq args...]: rewrite receipt.json through a fil
   printf '%s' "$base" | jq --argjson ask "$ask" --arg at "$(now)" "$@" ".ask = \$ask | .updatedAt = \$at | $filter" >"$receipt.new" && mv "$receipt.new" "$receipt"
 }
 
-finish() { # the run's last line: status, id, where it is
-  local status id file
-  status=$(jq -r '.processingStatus // "unknown"' "$receipt"); id=$(jq -r '.reportId' "$receipt"); file=$(jq -r '.document // empty' "$receipt")
+finish() { # the run's last line: status, id, Amazon's createdTime, where it is
+  local status id created file
+  status=$(jq -r '.processingStatus // "unknown"' "$receipt"); id=$(jq -r '.reportId' "$receipt")
+  created=$(jq -r '.createdTime // "unknown"' "$receipt"); file=$(jq -r '.document // empty' "$receipt")
   case "$status" in
-    DONE|FATAL) say "$status $id ${file:+$dir/$file}"; exit 0 ;;
-    CANCELLED) say "CANCELLED $id"; exit 0 ;;
-    *) say "$status $id since $(jq -r '.createdTime // "unknown"' "$receipt") $receipt"; exit 3 ;;
+    DONE|FATAL) say "$status $id created $created${file:+ $dir/$file}"; exit 0 ;;
+    CANCELLED) say "CANCELLED $id created $created"; exit 0 ;;
+    *) say "$status $id created $created $receipt"; exit 3 ;;
   esac
 }
-
-terminal() { case "$1" in DONE|CANCELLED|FATAL) return 0 ;; *) return 1 ;; esac; }
 
 drop_link() { # the link leaves a landed getReportDocument reply, whole or cut short
   if jq 'del(.url)' "$1" >"$1.new" 2>/dev/null; then mv "$1.new" "$1"
@@ -95,9 +110,6 @@ report_id='' status=''
 if [ -f "$receipt" ]; then
   status=$(jq -r '.processingStatus // ""' "$receipt")
   report_id=$(jq -r '.reportId // ""' "$receipt")
-  if terminal "$status" && { [ "$status" = CANCELLED ] || [ -n "$(jq -r '.document // empty' "$receipt")" ] || [ "$(jq -r '.reportDocumentId // ""' "$receipt")" = "" ]; }; then
-    finish
-  fi
 fi
 
 if [ -z "$report_id" ]; then
