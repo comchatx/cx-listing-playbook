@@ -39,9 +39,9 @@ done
 case "$wait$every" in *[!0-9]*) usage ;; esac
 [ "$every" -gt 0 ] || usage
 
-ask=$(jq -nS --arg origin "$origin" --arg type "$type" --arg m "$marketplaces" --arg start "$start" --arg end "$end" \
+ask=$(jq -nS --arg origin "$origin" --arg type "$type" --arg m "$marketplaces" --arg start "$start" --arg stop "$end" \
   --args '{origin: $origin, reportType: $type, marketplaceIds: ($m | split(",")),
-    dataStartTime: (if $start == "" then null else $start end), dataEndTime: (if $end == "" then null else $end end),
+    dataStartTime: (if $start == "" then null else $start end), dataEndTime: (if $stop == "" then null else $stop end),
     reportOptions: ($ARGS.positional | map(capture("^(?<k>[^=]+)=(?<v>.*)$") | {(.k): .v}) | add)}' "${options[@]+"${options[@]}"}") || usage
 key="${marketplaces//,/+}_${start:-open}_${end:-open}_$(printf '%s' "$ask" | cksum | cut -d' ' -f1)"
 dir="$TREE/reports/$type/${key//[:\/]/-}"
