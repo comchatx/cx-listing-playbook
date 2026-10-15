@@ -57,7 +57,9 @@ function world(options: { readonly statuses: readonly string[]; readonly reports
   const holdingLink = () => (readdirSync(tree, { recursive: true }) as string[]).map((file) => join(tree, file)).filter((file) => statSync(file).isFile() && readFileSync(file, "utf8").includes(link));
   /** Everything under the scenario's root, the stub's own files and the tree alike. */
   const listing = () => (readdirSync(root, { recursive: true }) as string[]).map((file) => file.split(sep).join("/")).sort();
-  return { exec, run, runAs, calls, askDir, place, receipt, tree, stub, download, link, holdingLink, listing };
+  /** curl's arguments, one line per curl run. */
+  const curlRuns = () => (existsSync(join(stub, "curl.log")) ? readFileSync(join(stub, "curl.log"), "utf8").trim().split("\n").filter(Boolean) : []);
+  return { exec, run, runAs, calls, askDir, place, receipt, root, tree, stub, download, link, holdingLink, listing, curlRuns };
 }
 
 it("creates, polls to DONE, lands the decompressed document beside a receipt with the report id and Amazon's status, and never prints the link", () => {
@@ -80,7 +82,7 @@ it("creates, polls to DONE, lands the decompressed document beside a receipt wit
   expect(w.holdingLink()).toEqual([]);
   const ask = relative(w.tree, w.askDir()).split(sep).join("/");
   expect(w.listing()).toEqual([
-    "document.tsv.gz", "stub", "stub/calls.log", "stub/create.json", "stub/document.json", "stub/reports.json", "stub/statuses", "stub/statuses.bak", "tenant", "tenant/reports", "tenant/reports/STUB_REPORT", `tenant/${ask}`, `tenant/${ask}/1`,
+    "document.tsv.gz", "stub", "stub/calls.log", "stub/create.json", "stub/curl.log", "stub/document.json", "stub/reports.json", "stub/statuses", "stub/statuses.bak", "tenant", "tenant/reports", "tenant/reports/STUB_REPORT", `tenant/${ask}`, `tenant/${ask}/1`,
     ...["create-1.cx.json", "create-1.json", "create-body.json", "document-1.cx.json", "document-1.json", "receipt.json", "report-1.cx.json", "report-1.json", "report-2.cx.json", "report-2.json", "report-3.cx.json", "report-3.json", "report.txt"].map((file) => `tenant/${ask}/1/${file}`),
   ].sort());
 });
@@ -160,6 +162,7 @@ it("a failed download is asked again by the next run, from getReportDocument, wi
   expect(w.calls().slice(before)).toEqual(["GET /reports/2021-06-30/documents/amzn1.spdoc.1.4.na.STUB", "DOWNLOAD"]);
   expect(readFileSync(join(w.place(), "report.txt"), "utf8")).toBe(DOCUMENT);
   expect(w.holdingLink()).toEqual([]);
+  expect(w.curlRuns()).toEqual(["-sS --fail -o document.download <link>", "-sS --fail -o document.download <link>"]);
 });
 
 it("a flag that takes a value, given last without one, ends in the usage text before any call", () => {
@@ -255,3 +258,47 @@ it("refuses an ask without the origin, the store or the wait, before any call", 
   expect(done.stderr).toContain("report.sh <reportType>");
   expect(readdirSync(root)).toEqual([]);
 });
+
+const ORIGIN = ASK[1]!;
+
+it("a store, start or end carrying / or .. stays one ask directory, and everything the run lands is inside it", () => {
+  for (const flags of [["--marketplace", "../../../../ESC_M"], ["--marketplace", "A/../../../../ESC_M2"], ["--start", "../../../../../ESC_S", "--end", "x"], ["--start", "2026", "--end", "/../../../../ESC_E"],
+    ["--option", "a=../../../../ESC_O"], ["--marketplace", "..", "--start", "..", "--end", ".."], ["--marketplace", "."]]) {
+    const w = world({ statuses: ["DONE"] });
+    expect(w.exec(TYPE, "--origin", ORIGIN, "--marketplace", "ATVPDKIKX0DER", ...flags, "--wait", "0").exit, flags.join(" ")).toBe(0);
+    const asks = readdirSync(join(w.tree, "reports", TYPE));
+    expect(asks, flags.join(" ")).toHaveLength(1);
+    const inside = `tenant/reports/${TYPE}/${asks[0]}`;
+    const outside = w.listing().filter((file) => !/^(stub|document\.tsv)/.test(file) && !["tenant", "tenant/reports", `tenant/reports/${TYPE}`, inside].includes(file) && !file.startsWith(`${inside}/`));
+    expect(outside, flags.join(" ")).toEqual([]);
+    expect(readFileSync(join(w.place(), "report.txt"), "utf8"), flags.join(" ")).toBe(DOCUMENT);
+  }
+});
+
+it("a --wait or --every that is not digits is refused before any call, and nothing runs it as code", () => {
+  const w = world({ statuses: ["IN_QUEUE"] });
+  const before = w.listing();
+  const code = `SECONDS[$(touch ${join(w.root, "RAN")})]`;
+  for (const flags of [["--wait", code], ["--wait", "1", "--every", code], ["--wait", "x"], ["--wait", "1", "--every", "1x"]]) {
+    const got = w.exec(TYPE, ...ASK, ...flags);
+    expect(got.exit, flags.join(" ")).toBe(2);
+    expect(got.err, flags.join(" ")).toContain("report.sh <reportType>");
+  }
+  expect(w.calls()).toEqual([]);
+  expect(w.listing()).toEqual(before);
+});
+
+for (const [label, other] of [["an option", [...ASK, "--option", "reportPeriod=WEEK"]], ["the origin", ["--origin", "https://sellingpartnerapi-eu.amazon.com", ...ASK.slice(2)]]] as const) {
+  it(`two asks that differ only by ${label}: the second makes its own createReport and never reads the first's unfinished report`, () => {
+    const w = world({ statuses: ["IN_QUEUE"], createIds: ["50001", "50002"] });
+    const first = w.exec(TYPE, ...ASK, "--wait", "0");
+    expect(first.exit).toBe(3);
+    expect(first.out).toMatch(/^IN_QUEUE 50001 /);
+    const before = w.calls().length;
+    const second = w.exec(TYPE, ...other, "--wait", "0");
+    expect(second.exit).toBe(3);
+    expect(second.out).toMatch(/^IN_QUEUE 50002 /);
+    expect(w.calls().slice(before)).toEqual(["POST /reports/2021-06-30/reports", "GET /reports/2021-06-30/reports/50002"]);
+    expect(readdirSync(join(w.tree, "reports", TYPE))).toHaveLength(2);
+  });
+}
