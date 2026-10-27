@@ -1,4 +1,4 @@
-import { readFileSync, readdirSync } from "node:fs";
+import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { expect, it } from "vitest";
@@ -18,6 +18,12 @@ it("the pinned pi loads four skills and three templates from the package, and no
   expect(skills.skills.map((skill) => skill.filePath).sort()).toEqual(SKILLS.map(skillFile));
   expect(prompts.prompts.map((prompt) => prompt.name).sort()).toEqual(["listing-create", "listing-review", "listing-watch"]);
   expect(loader.getExtensions().extensions).toEqual([]);
+});
+
+it("every directory under skills/ holds a SKILL.md, and each is one of the package's skills", () => {
+  const directories = readdirSync(join(ROOT, "skills"), { withFileTypes: true }).filter((entry) => entry.isDirectory()).map((entry) => entry.name).sort();
+  for (const name of directories) expect(existsSync(skillFile(name)), `skills/${name}/SKILL.md`).toBe(true);
+  expect(directories).toEqual([...SKILLS]);
 });
 
 it("each template expands in a pi session: the ASIN or the marketplaces, and the seller's own words reach the model, no placeholder does", async () => {

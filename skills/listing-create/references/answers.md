@@ -8,7 +8,9 @@
 - `4005013` is an item already in the seller's catalog under another SKU (P-listing-create-8).
 - `90225` and `90188` are an identifier of the wrong length or checksum: 12 for UPC, 13 for EAN, 14 for GTIN (P-listing-create-9).
 - An approval requirement on a new item shows as a `QUALIFICATION_REQUIRED` issue on the preview or the write (P-listing-create-22).
-- Issues that conflict with another catalog item are resolved by a support case with the identifiers Amazon's resolution names, not by resubmitting (P-brand-protection-and-catalog-contribution-4).
+- `4005011` is a value that conflicts with another catalog item: the submitted value is changed to the catalog's, or Amazon is contacted to change the catalog's (P-listing-create-24).
+- `4005033` is a value that cannot be edited: it is reverted to the original and resubmitted, and a support case disputes an original that is wrong (P-listing-create-24).
+- `101165` is SKU, external ID and ASIN matching several products: they are made unique and resubmitted, and support resolves a duplicate in Amazon's catalog (P-listing-create-24).
 
 ## Sandbox
 

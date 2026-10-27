@@ -30,9 +30,9 @@
 ## Images
 
 - Images are given as locations Amazon fetches: public HTTPS on S3, CloudFront or a third-party server, or a private S3 bucket Amazon's role may read (P-listing-create-14).
-- A file in the seller's tree has no such location, so the seller gives one (P-images-and-video-5).
+- Amazon fetches media only from a location it can reach with the permissions Submit media attributes names, and a file in the seller's tree is no such location (P-listing-create-14; P-images-and-video-5).
 - They go in the locator attributes the store's schema offers, with `media_location` (P-images-and-video-4; P-listing-create-14).
-- New content takes a new location (P-listing-create-14; P-images-and-video-20).
+- Private S3 content is treated as immutable, so new content there takes a new object key (P-listing-create-14).
 - An image applies to the ASIN in every store where it exists (P-listing-writes-10).
 - An image of a photorealistic AI-generated person carries the `contains-synthetic-performer` tag (P-images-and-video-25).
 - Main-block video is a Seller Central task (P-images-and-video-9).

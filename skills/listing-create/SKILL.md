@@ -30,7 +30,7 @@ Facts cite P-<file>-<n> in research/<angles|elements|method>/<file>.md; pointers
 ## Request
 
 - A creation is `PUT /listings/2021-08-01/items/{sellerId}/{sku}?marketplaceIds=<one>&includedData=identifiers,issues&issueLocale=<locale>` with a body of `productType`, `requirements` and `attributes` in the schema's names and shapes, one store per request (P-listing-create-7).
-- The values come from the seller's data; a value the data does not hold is asked of the seller, never made up (P-listing-create-15; P-attributes-and-browse-nodes-16).
+- The request carries only truthful values that the seller's data or the seller supports, and compliance declarations are the seller's own, since Amazon cannot determine them (P-listing-create-9; P-listing-create-15; P-attributes-and-browse-nodes-16).
 - references/request.md holds identity, language, price, fulfilment, images and compliance.
 
 ## Preview and write
@@ -45,7 +45,7 @@ Facts cite P-<file>-<n> in research/<angles|elements|method>/<file>.md; pointers
 
 - `GET /listings/2021-08-01/items/{sellerId}/{sku}` with `includedData=summaries,attributes,issues,offers,fulfillmentAvailability,relationships` is read again until it settles (P-listing-create-19).
 - The creation is done when the store's summary carries an ASIN, `status` holds `BUYABLE` and `DISCOVERABLE`, and no issue is `ERROR` (P-listing-create-19).
-- An empty summary means no ASIN was matched or made yet; Amazon states no time for it, so cx reads back rather than waits a figure (P-listing-create-19).
+- Amazon's FAQ reads an empty summary as a submission that failed and did not match an ASIN, and no page states how long a creation takes (P-listing-create-19).
 - Then `getCatalogItem` on that ASIN shows what shoppers see, which can differ from what was sent (P-listing-writes-7).
 
 ## Families
@@ -61,7 +61,7 @@ Facts cite P-<file>-<n> in research/<angles|elements|method>/<file>.md; pointers
 ## Sandbox
 
 - A static sandbox answer proves a request's path, signing and shape, never the product type, the schema, the identity or Amazon's verdict on the seller's product (P-listing-create-20).
-- references/answers.md holds the issues that name identity, brand and catalog conflicts, and the sandbox's fixed answers.
+- references/answers.md holds the issues that name identity, brand and catalog conflicts with the resolution each names, and the sandbox's fixed answers.
 
 ## References
 
