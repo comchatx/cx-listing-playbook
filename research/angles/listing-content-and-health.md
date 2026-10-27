@@ -543,7 +543,7 @@ These hold at the level of mechanism. Every number below is located, not pinned.
 - **Amazon's view.** `getCatalogItem` on `<ASIN>` with `includedData=summaries,attributes,images,classifications,relationships,salesRanks,productTypes,identifiers`. Diff it field by field against the submitted attributes.
 - **Requirements.** `getDefinitionsProductType` for the listing's `productType`, store, `sellerId`, `requirements=LISTING` and the right `parentageLevel`. Read `maxLength` (and `maxUtf8ByteLength` where present) on `item_name`, `title_differentiation`, `bullet_point`, `product_description` and `generic_keyword`, the image attributes offered, required attributes, enums and conditionals, and keep the version and checksum. These are the binding figures wherever Amazon's help pages disagree with one another or with the schema.
 - **Eligibility, when relevant.** `getListingsRestrictions`.
-- **A preview, only with the seller's word.** `patchListingsItem` with `mode=VALIDATION_PREVIEW`. Then, after any real write, re-read `getListingsItem`.
+- **A preview.** `patchListingsItem` with `mode=VALIDATION_PREVIEW`, sent as any read is, since it persists nothing (ruled by brief 2026-10-26-87). A write without the mode waits for the seller's word. Then, after any real write, re-read `getListingsItem`.
 - **Store-wide sweep.** `searchListingsItems` with `withIssueSeverity=ERROR`, or `withStatus=DISCOVERABLE&withoutStatus=BUYABLE`, and so on (cap 1,000). Or door.md's `createReport` / `getReport` / `getReportDocument` for `GET_MERCHANTS_LISTINGS_FYP_REPORT` and `GET_MERCHANT_LISTINGS_ALL_DATA`. Names, options and waits are door.md's.
 - **Rate headers.** `x-amzn-RateLimit-Limit` on every reply.
 - **Competitors' content.** The Keepa product fields listed above, from the Keepa skill. Changes are visible only as a diff between snapshots cx kept.
@@ -723,7 +723,7 @@ Reconciliation reads, 2026-10-14. Help-page captures were read from the office's
 - (Gap fill) A sweep over 1,000 matching SKUs: is it complete if sliced by `lastUpdatedAfter` / `lastUpdatedBefore` or `createdAfter` windows? Amazon's pages do not say.
 - Do the FYP report's "Reason" values map one-to-one to `issues[].code`, or are they a separate vocabulary?
 - After a 75-character AI rewrite, does `getCatalogItem` show the new name in `summaries.itemName`, in `attributes.item_name`, or in both? And does `BRANDED_ITEM_CONTENT_CHANGE` fire for it?
-- Does `patchListingsItem` with `VALIDATION_PREVIEW` count as a write under this line's "nothing sent without the seller's word" rule? It persists nothing but is a PATCH. This needs the office's ruling.
+- Ruled (brief 2026-10-26-87): `patchListingsItem` or `putListingsItem` with `VALIDATION_PREVIEW` persists nothing (P-listing-writes-5), so it is sent as any read is; a write without the mode waits for the seller's word.
 - Should door.md carry the listing report names (`GET_MERCHANT_LISTINGS_ALL_DATA`, `GET_MERCHANTS_LISTINGS_FYP_REPORT`) with options and waits? It holds none today.
 - Can cx ever receive notifications (SQS/EventBridge)? Without a destination, every "watch" is a poll against rate limits.
 - How fresh are Keepa's content fields (`title`, `features`, `description`) relative to the live page? angles/competitor-set.md quotes Keepa's docs: "If our last update is older than ~1 hour, it will be automatically refreshed before being delivered." That bounds Keepa's own copy at request time; whether Keepa's copy matches what the detail page shows is still open.
