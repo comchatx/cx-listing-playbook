@@ -1,13 +1,14 @@
 # evals
 
-The test cases and trigger queries the three skills were measured with, in the shapes Anthropic's `skill-creator` reads. Nothing here ships: `package.json`'s `files` names `skills`, `prompts` and `research` only.
+The test cases and trigger queries the skills were measured with (the three 0.1 skills on 2026-10-14, listing-create on 2026-10-27), in the shapes Anthropic's `skill-creator` reads. Nothing here ships: `package.json`'s `files` names `skills`, `prompts` and `research` only.
 
 | File | What it holds |
 |---|---|
-| `listing-review.json`, `listing-change-log.json`, `effect-review.json` | `skill-creator`'s `evals.json` for each skill: the seller's message, the expected result and the assertions a grader checks. |
+| `listing-review.json`, `listing-change-log.json`, `effect-review.json`, `listing-create.json` | `skill-creator`'s `evals.json` for each skill: the seller's message, the expected result and the assertions a grader checks. |
 | `triggers/<skill>.json` | 20 queries per skill, 10 that should load it and 10 near misses that should not, for `skill-creator`'s description loop. |
 | `fixture.py` | Writes a synthetic seller's tree: `python3 -I evals/fixture.py <dir>` replaces `<dir>/tenant` and leaves the rest of `<dir>` as it was. Today in it is 2026-10-14; marketplace `ATVPDKIKX0DER`; the seller's ASINs are `B0FIXTURE1`–`7`, competitors `B0COMPET01`–`02`. No real seller's data and no Amazon reply is in it. |
-| `cx` | A stand-in for the box's `cx` for these runs: `cx raw amazon-sp-api --method GET --path <path>` answers from the landed replies under `$TENANT_TREE/raw/amazon-sp-api/`, any other method is refused, and each call is appended to `$TENANT_TREE/../cx-calls.log`. |
+| `fixture_create.py` | listing-create's cases: `python3 -I evals/fixture_create.py <dir>` writes the tree above, then adds the seller's stores, four products under `tenant/products/` and the schema documents under `tenant/raw/documents/`; Amazon's replies for these cases go to `<dir>/stub-replies/`, beside the tree, where the run is told not to look. |
+| `cx` | A stand-in for the box's `cx` for these runs: `cx raw amazon-sp-api --method GET --path <path>` answers from `$TENANT_TREE/../stub-replies/` first, then the landed replies under `$TENANT_TREE/raw/amazon-sp-api/` (a catalog search with several comma-separated identifiers gets their replies merged); a Listings Items PUT or PATCH with `--query mode=VALIDATION_PREVIEW` is answered from the preview replies, a `-if-<token>` reply when the body holds that token; any other write is refused, and each call is appended to `$TENANT_TREE/../cx-calls.log`. |
 
 ## A run
 

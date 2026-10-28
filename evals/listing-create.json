@@ -1,0 +1,74 @@
+{
+  "skill_name": "listing-create",
+  "evals": [
+    {
+      "id": 1,
+      "name": "new-kettle-us-preview",
+      "prompt": "Create my listing in US from my words: 新品上架，水壶的资料在 /tenant/products/ember-kettle/product.md，我们自己发货。先预览一下，有问题告诉我。",
+      "expected_output": "Reads the stores, searches the US catalog by the UPC (no match, so a new item), finds the product type KETTLE, reads its US schema and the schema document, checks the SKU is not already listed, builds a put from the seller's data in the schema's shapes (en_US, USD, DEFAULT with quantity, the shipping template's enum key, image locators with the https URLs), sends it with mode=VALIDATION_PREVIEW, and reports INVALID with wattage missing, without inventing a wattage or sending the real write.",
+      "files": [],
+      "expectations": [
+        "cx-calls.log shows a GET of /sellers/v1/marketplaceParticipations.",
+        "cx-calls.log shows a catalog search (/catalog/2022-04-01/items) with identifiers=012345678905 before any PUT.",
+        "cx-calls.log shows a GET of /definitions/2020-09-01/productTypes/KETTLE, and outputs/commands.txt shows the schema document amzn1.ptd.KETTLE.ATVPDKIKX0DER.json being read.",
+        "cx-calls.log shows a GET of /listings/2021-08-01/items/A1FIXTURESELLER/HL-KETTLE-BLK before the first PUT.",
+        "cx-calls.log shows a PUT to /listings/2021-08-01/items/A1FIXTURESELLER/HL-KETTLE-BLK with mode=VALIDATION_PREVIEW and a body with productType KETTLE.",
+        "The preview body writes text values with language_tag en_US, the UPC under externally_assigned_product_identifier, and purchasable_offer with currency USD and 39.99.",
+        "The preview body has fulfillment_availability with fulfillment_channel_code DEFAULT and quantity 50, and merchant_shipping_group as the enum key a1b2c3d4-two-day (not a label).",
+        "The preview body gives images as main_product_image_locator (and other_product_image_locator_N) with the https://cdn.hearthly.example URLs in media_location.",
+        "No wattage value appears in any preview body (the seller's data has none), and the answer reports the preview as INVALID with wattage named as the missing attribute.",
+        "No PUT or PATCH without mode=VALIDATION_PREVIEW appears in cx-calls.log."
+      ]
+    },
+    {
+      "id": 2,
+      "name": "existing-asin-de-offer",
+      "prompt": "Create my listing in DE from my words: 这条毯子在美国卖得不错，德国站也想上，EAN、SKU 和价格在 /tenant/products/fleece-de/product.md，走 FBA。先别真的提交。",
+      "expected_output": "Searches the DE catalog by the EAN, finds B0FIXTURE1, so makes an offer-only listing on it rather than a new detail page: reads the restrictions for B0FIXTURE1, the PRODUCT schema with LISTING_OFFER_ONLY, and previews a put with merchant_suggested_asin B0FIXTURE1, purchasable_offer in EUR for A1PA6795UKMFR9, and fulfillment_channel_code AMAZON_EU without a quantity; reports VALID and sends no real write.",
+      "files": [],
+      "expectations": [
+        "cx-calls.log shows a catalog search with identifiers=4006381333931 and marketplaceIds=A1PA6795UKMFR9.",
+        "The answer identifies the existing ASIN B0FIXTURE1 from the catalog search's reply (product.md does not name it) and treats this as an offer on it, not a new detail page with product facts.",
+        "cx-calls.log shows a GET of /listings/2021-08-01/restrictions with asin=B0FIXTURE1.",
+        "A preview PUT for SKU HL-FLEECE-GRY-DE has productType PRODUCT, requirements LISTING_OFFER_ONLY and merchant_suggested_asin B0FIXTURE1.",
+        "The preview body's fulfillment_availability uses fulfillment_channel_code AMAZON_EU with no quantity.",
+        "The preview body's purchasable_offer has currency EUR, 34.99 and marketplace_id A1PA6795UKMFR9, and the PUT's marketplaceIds is A1PA6795UKMFR9.",
+        "The answer reports the preview's VALID status.",
+        "No PUT or PATCH without mode=VALIDATION_PREVIEW appears in cx-calls.log."
+      ]
+    },
+    {
+      "id": 3,
+      "name": "cushion-family-local-images",
+      "prompt": "Create my listing in US from my words: 亚麻抱枕套两个颜色，做成一个变体，资料和图片都在 /tenant/products/linen-cushion/，帮我把整套预览一遍。",
+      "expected_output": "Searches the catalog by each child's UPC (no match), reads the PILLOW schema (at PARENT and CHILD parentage, or its allOf conditionals), previews the parent first (parentage_level parent, child_parent_sku_relationship variation, variation_theme COLOR, no offer) and then each child (parent_sku HL-LINEN-PARENT, the same theme, its colour and UPC, an offer); says the images are local files Amazon cannot fetch and puts no file path or made-up URL in media_location; sends no real write.",
+      "files": [],
+      "expectations": [
+        "cx-calls.log shows catalog searches with identifiers=012345678912 and identifiers=012345678929.",
+        "A preview PUT for HL-LINEN-PARENT has parentage_level parent, child_parent_sku_relationship with child_relationship_type variation, and a variation_theme, and carries no purchasable_offer or fulfillment_availability.",
+        "Preview PUTs for HL-LINEN-CRM and HL-LINEN-SGE each carry parentage_level child, parent_sku HL-LINEN-PARENT, the parent's variation_theme and their own colour and UPC.",
+        "In cx-calls.log the parent's preview PUT comes before either child's.",
+        "The variation theme used is COLOR (not the deprecated COLOR_NAME).",
+        "The answer says the images are local files Amazon cannot fetch and that a reachable location is needed.",
+        "No preview body puts a file path, file:// URL or invented https URL in media_location.",
+        "No PUT or PATCH without mode=VALIDATION_PREVIEW appears in cx-calls.log."
+      ]
+    },
+    {
+      "id": 4,
+      "name": "accepted-empty-summary-readback",
+      "prompt": "Create my listing in US from my words: 昨天提交的陶瓷杯套装（SKU HL-MUG-SET，资料在 /tenant/products/stoneware-mugs/）回了 ACCEPTED，可是网站上还搜不到，是不是再等几天就好？",
+      "expected_output": "Reads getListingsItem for HL-MUG-SET with summaries and issues, finds no summary and the ERROR issue 100980 (barcode already on another ASIN), looks the UPC up in the catalog (B0OTHER001, another brand's product), and tells the seller that ACCEPTED was not a creation and that waiting will not fix it: the identifier conflict is what stops it. It names no fixed waiting time, invents no other UPC and sends no write.",
+      "files": [],
+      "expectations": [
+        "cx-calls.log shows a GET of /listings/2021-08-01/items/A1FIXTURESELLER/HL-MUG-SET with includedData naming issues (and summaries).",
+        "The answer reports the ERROR issue 100980: the barcode (UPC 012345678936) is already associated with another product's ASIN.",
+        "cx-calls.log shows a catalog search with identifiers=012345678936, and the answer names B0OTHER001 (Kilnworks) as the product the barcode points to.",
+        "The answer says ACCEPTED meant only that the submission was taken for processing, and that the empty summary means no ASIN was matched or created: waiting will not make it appear.",
+        "The answer gives no fixed waiting time (such as 24-48 hours or a few days) as when the listing will show up.",
+        "The answer does not propose a made-up UPC, a UPC the seller does not own, or changing the brand to Generic as the fix.",
+        "No PUT or PATCH without mode=VALIDATION_PREVIEW appears in cx-calls.log."
+      ]
+    }
+  ]
+}
