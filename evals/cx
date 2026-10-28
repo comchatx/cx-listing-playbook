@@ -1,24 +1,55 @@
 #!/usr/bin/env bash
-# The skill-creator runs' stand-in for the box's cx: GETs are answered from the fixture's own landed replies; writes are refused.
+# The skill-creator runs' stand-in for the box's cx: GETs are answered from the fixture's own landed replies; a Listings Items
+# PUT or PATCH with --query mode=VALIDATION_PREVIEW is answered from the fixture's preview replies; every other write is refused.
 # Calls are logged to $TENANT_TREE/../cx-calls.log.
 set -uo pipefail
 T="${TENANT_TREE:?TENANT_TREE is the seller tree}"
 echo "cx $*" >>"$T/../cx-calls.log"
 [ "${1-}" = raw ] || { echo "stub cx: this run has only 'cx raw <source> ...'" >&2; exit 2; }
 src="${2-}"; shift 2
-method=GET path='' output='' json=0
+method=GET path='' output='' json=0 query='' body=''
 while [ $# -gt 0 ]; do case "$1" in
   --method) method="$2"; shift 2;; --path) path="$2"; shift 2;; --output) output="$2"; shift 2;; --json) json=1; shift;;
-  --origin|--query|--header|--body) shift 2;; *) shift;; esac; done
+  --query) query="$query&$2"; shift 2;; --body) body="$2"; shift 2;;
+  --origin|--header) shift 2;; *) shift;; esac; done
+q() { printf '%s' "$query" | tr '&' '\n' | sed -n "s/^$1=//p" | head -1; }
 refuse() { echo "{\"request_id\":\"stub\",\"paths\":[],\"cost\":[],\"refusal\":{\"reason\":\"$1\",\"detail\":\"$2\"}}"; exit 2; }
 [ "$src" = amazon-sp-api ] || refuse out_of_scope "stub: only amazon-sp-api in this run"
-[ "$method" = GET ] || refuse out_of_scope "stub: this run sends no write to Amazon"
-R="$T/raw/amazon-sp-api"; id="${path##*/}"
+R="$T/raw/amazon-sp-api"; S="$T/../stub-replies"; id="${path##*/}"
+# A reply is looked for first among the stand-in's own replies beside the tree (out of the run's sight), then among the tree's landed ones.
+latest() { ls -t "$S"/$1 2>/dev/null | head -1 | grep . || ls -t "$R"/$1 2>/dev/null | head -1; }
+if [ "$method" != GET ]; then
+  case "$method:$path" in PUT:/listings/2021-08-01/items/*|PATCH:/listings/2021-08-01/items/*) ;; *) refuse out_of_scope "stub: this run sends no write to Amazon";; esac
+  [ "$(q mode)" = VALIDATION_PREVIEW ] || refuse out_of_scope "stub: this run sends no write to Amazon; only a validation preview is answered"
+  case "$body" in @*) body=$(cat "${body#@}" 2>/dev/null);; esac
+  [ -f "$body" ] && body=$(cat "$body")
+  f=''
+  for c in "$S"/putListingsItem-preview-"$id"-if-*.json "$R"/putListingsItem-preview-"$id"-if-*.json; do [ -e "$c" ] || continue; t="${c##*-if-}"; t="${t%.json}"
+    case "$body" in *"$t"*) f="$c";; esac; done
+  [ -n "$f" ] || f="$S/putListingsItem-preview-$id.json"; [ -e "$f" ] || f="$R/putListingsItem-preview-$id.json"
+  [ -e "$f" ] || refuse out_of_scope "stub: no preview fixture for this SKU"
+  [ -n "$output" ] || output="$R/stub-$(date +%s%N)-${id}.json"
+  [ ! -e "$output" ] || refuse out_of_scope "the file is already there"
+  cp "$f" "$output"
+  [ $json -eq 1 ] && echo "{\"request_id\":\"stub\",\"paths\":[{\"path\":\"$path\",\"http_status\":200,\"outcome\":{\"kind\":\"fresh\"},\"file\":\"$output\"}],\"cost\":[]}" || echo "$output"
+  exit 0
+fi
 case "$path" in
-  /listings/2021-08-01/items/*) f=$(ls -t "$R"/getListingsItem-"$id"-*.json 2>/dev/null | head -1) ;;
-  /catalog/2022-04-01/items/*) f=$(ls -t "$R"/getCatalogItem-"$id"-*.json 2>/dev/null | head -1) ;;
-  /products/pricing/v0/items/*/offers) a="${path#/products/pricing/v0/items/}"; a="${a%/offers}"; f=$(ls -t "$R"/getItemOffers-"$a"-*.json 2>/dev/null | head -1) ;;
-  /definitions/2020-09-01/productTypes/*) f=$(ls -t "$R"/getDefinitionsProductType-"$id"-*.json 2>/dev/null | head -1) ;;
+  /listings/2021-08-01/items/*) f=$(latest "getListingsItem-$id-*.json") ;;
+  /sellers/v1/marketplaceParticipations) f=$(latest "getMarketplaceParticipations-*.json") ;;
+  /catalog/2022-04-01/items) i=$(q identifiers); f=''
+    case "$i" in
+      *,*) # Amazon takes several identifiers at once (comma-separated, URL-encoded or not): the replies for each are merged.
+        m="$T/../stub-merged-$$.json"; parts=()
+        for one in $(printf '%s' "$i" | sed 's/%2C/,/gI' | tr ',' ' '); do g=$(latest "searchCatalogItems-$one-*.json"); [ -n "$g" ] && parts+=("$g"); done
+        [ ${#parts[@]} -gt 0 ] && jq -s '{numberOfResults: (map(.numberOfResults) | add), items: (map(.items) | add)}' "${parts[@]}" >"$m" && f="$m" ;;
+      ?*) f=$(latest "searchCatalogItems-$i-*.json") ;;
+    esac ;;
+  /listings/2021-08-01/restrictions) a=$(q asin); f=$(latest "getListingsRestrictions-$a-*.json") ;;
+  /definitions/2020-09-01/productTypes) f=$(latest "searchDefinitionsProductTypes-*.json") ;;
+  /catalog/2022-04-01/items/*) f=$(latest "getCatalogItem-$id-*.json") ;;
+  /products/pricing/v0/items/*/offers) a="${path#/products/pricing/v0/items/}"; a="${a%/offers}"; f=$(latest "getItemOffers-$a-*.json") ;;
+  /definitions/2020-09-01/productTypes/*) f=$(latest "getDefinitionsProductType-$id-*.json") ;;
   *) f='' ;;
 esac
 [ -n "$output" ] || output="$R/stub-$(date +%s%N)-${id}.json"

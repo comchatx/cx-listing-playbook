@@ -1,0 +1,22 @@
+[
+  {"query": "I've got a new gooseneck kettle we manufacture ourselves, UPC from GS1, images on our CDN. can you put it up on amazon.com for me through the SP-API? product sheet is in /tenant/products/kettle.md", "should_trigger": true},
+  {"query": "新品要上架亚马逊美国站和德国站，资料我都整理在 /tenant/products/new-router/ 里了，帮我建 listing", "should_trigger": true},
+  {"query": "we already sell this blanket on amazon US as B0FIXTURE1, now want to add an offer on amazon.de with FBA at 34.99 EUR — what's the putListingsItem body look like and can you preview it?", "should_trigger": true},
+  {"query": "how do I create a parent/child variation family for my cushion covers (cream, sage) via the listings items api, which comes first and what attributes go on the parent", "should_trigger": true},
+  {"query": "my product doesn't have a UPC, it's a handmade item, I got GTIN exemption approved last week. how do I list it through the API now?", "should_trigger": true},
+  {"query": "searchDefinitionsProductTypes gave me KETTLE and HOT_WATER_DISPENSER for my product, which one, and then how do I get the schema to build the create request", "should_trigger": true},
+  {"query": "I sent putListingsItem for a brand new SKU and got ACCEPTED an hour ago but getListingsItem has no summaries and nothing on the site. did it work?", "should_trigger": true},
+  {"query": "帮我把这三个新 SKU 在亚马逊上建出来，先用 VALIDATION_PREVIEW 跑一遍看缺什么字段，别真提交", "should_trigger": true},
+  {"query": "we want to launch our sunscreen in the UK and EU stores, it's not on amazon anywhere yet. what do we need ready (GPSR, responsible person, images) and can you build the listing", "should_trigger": true},
+  {"query": "new product, brand is in brand registry under our account, I want to list it in Canada and Mexico too — do I use Build International Listings or create each store separately with the API?", "should_trigger": true},
+  {"query": "my listing B09ZK3LM2P conversion dropped from 12% to 8% this month, can you look at the title and bullets and tell me what to fix", "should_trigger": false},
+  {"query": "I changed the bullets on B0C7X2KQ9L two weeks ago — did it actually help sales or was it the prime day bump?", "should_trigger": false},
+  {"query": "log this before I submit: replacing search terms on B0FIXTURE7 with the new set, seller approved it yesterday", "should_trigger": false},
+  {"query": "patch the price on my existing listing HL-FLEECE-GRY to 27.99 and tell me if it wins the buy box back", "should_trigger": false},
+  {"query": "pull last month's GET_MERCHANT_LISTINGS_ALL_DATA report for the US store and tell me how many active listings we have", "should_trigger": false},
+  {"query": "write me a shopify product page for our new kettle, with SEO title and meta description", "should_trigger": false},
+  {"query": "can you watch my top 5 ASINs every day and ping me only when something breaks", "should_trigger": false},
+  {"query": "how do I create an inbound FBA shipment plan for 200 units of an existing SKU going to the EU warehouses", "should_trigger": false},
+  {"query": "my listing got suppressed for missing item_package_dimensions — what does that issue mean and how do I patch it", "should_trigger": false},
+  {"query": "write an A+ content module for our blanket brand page comparing the three sizes", "should_trigger": false}
+]
