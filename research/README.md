@@ -1,6 +1,6 @@
 # Research for cx-listing-playbook
 
-This directory is the research base for the pi package cx-listing-playbook: the skills listing-review (which carries references/writing.md), listing-change-log, effect-review and listing-create, the script scripts/report.sh, and three templates, /listing-review, /listing-watch (which writes the standing instruction) and /listing-create; every file here was read on 2026-10-14, except method/listing-create.md, read on 2026-10-27. Sources are weighed in this order and tagged by type: Amazon's own words first, tagged [official] (Seller Central help, SP-API docs and models, Amazon Ads, aboutamazon.com, sell.amazon.com, Amazon staff posts in Seller Forums; Keepa's own documentation and code, and regulators' pages, carry the same tag); then named practitioners and vendors, tagged [opinion]; then published research and Amazon Science, tagged [research]; the researching seat's own reasoning is tagged [seat], and no skill states a [seat] item as fact. Two limits were kept: no Amazon or Keepa API host was called (no `sellingpartnerapi-*`, no `api.keepa.com`; documentation pages only), and no seller data is held here (no store names, seller ids, real seller ASINs or store figures; `<ASIN>` and `<SKU>` stand in). Seller Central help pages were read through the help hub's own content call, as recorded in method/help-page-access.md, and the standing use of that call is for the office to rule.
+This directory is the research base for the pi package cx-listing-playbook: the skills listing-review (which carries references/writing.md), listing-change-log, effect-review, listing-create and featured-offer, the script scripts/report.sh, and two templates, /listing-review and /listing-create. /listing-watch (which writes the standing instruction) moved in 0.3.0 to its own package, `@comchatx/cx-listing-watch`; the rows and positions below that name it are the research its template rests on. Every file here was read on 2026-10-14, except method/listing-create.md, read on 2026-10-27, and method/featured-offer.md, read on 2026-10-28. Sources are weighed in this order and tagged by type: Amazon's own words first, tagged [official] (Seller Central help, SP-API docs and models, Amazon Ads, aboutamazon.com, sell.amazon.com, Amazon staff posts in Seller Forums; Keepa's own documentation and code, and regulators' pages, carry the same tag); then named practitioners and vendors, tagged [opinion]; then published research and Amazon Science, tagged [research]; the researching seat's own reasoning is tagged [seat], and no skill states a [seat] item as fact. Two limits were kept: no Amazon or Keepa API host was called (no `sellingpartnerapi-*`, no `api.keepa.com`; documentation pages only), and no seller data is held here (no store names, seller ids, real seller ASINs or store figures; `<ASIN>` and `<SKU>` stand in). Seller Central help pages were read through the help hub's own content call, as recorded in method/help-page-access.md, and the standing use of that call is for the office to rule.
 
 ## How to read this
 
@@ -57,6 +57,7 @@ Every research file has one layout: what it covers; Amazon's rules; what practit
 |---|---|---|---|
 | amazon-change-calendar.md | dated Amazon-side changes that break a before/after reading | all (confounder) | effect-review; listing-change-log |
 | effect-measurement.md | MYE, windows, controls, confounders, verdicts, noise, placebo, durability | all | effect-review; listing-change-log |
+| featured-offer.md | how Amazon picks the Featured Offer, reading who holds it and why not, which causes a Listings Items write reaches, the Support API | offer | featured-offer |
 | funnel-and-search.md | the funnel, its gates, which element serves which stage, Amazon search's own words | all | listing-review |
 | help-page-access.md | how Seller Central help pages were read, how to cite them, and what each captured page says, by owning file | none (method) | research upkeep; listing-review; writing.md |
 | (not in this repository) | 54 dated text captures of Seller Central help pages, each named `<page id>-v<version>`: Amazon's own text, so the office keeps them and this repository cites them as `capture <id>-v<n>` | none (evidence) | research upkeep |
@@ -382,6 +383,8 @@ Each position is one sentence, followed by the P-ids that carry it and the names
 
 ### The templates and the standing instruction
 
+/listing-watch is `@comchatx/cx-listing-watch`'s template from 0.3.0; T1–T16 stay here as the research it and the playbook's listing-review rest on.
+
 - **T1.** /listing-watch writes a standing instruction that states what to watch (the ASINs, the competitor set, the trigger families), how often, the seller's own thresholds, when to speak and when to stay quiet, and where to report, with no default threshold supplied. — P-triggers-13. [opinion] Jungle Scout, Amazon Product Alerts; Helium 10, Alerts; Google SRE ch. 6.
 - **T2.** Between summaries cx speaks only for a new signal the seller can act on (a suppression, a lost Featured Offer, a stock-out, a content change nobody on the seller's side made), and everything else goes into the scheduled summary. — P-triggers-14. [official] Manage Listings Issues. [opinion] Google SRE ch. 6.
 - **T3.** The standing instruction states a false-alarm budget for the whole watch, and each metric is charted against that ASIN's own history. — P-triggers-29. [research] NIST/SEMATECH e-Handbook §6.3; Benjamini and Hochberg 1995.
@@ -634,6 +637,7 @@ Counts are rows of each file's *Pages read* table, so a page read by several fil
 | elements/variations.md | 73 | 12 | 4 | 10 |
 | method/amazon-change-calendar.md | 30 | 3 | 2 | 2 |
 | method/effect-measurement.md | 50 | 12 | 26 | 6 |
+| method/featured-offer.md | 8 | 0 | 0 | 0 |
 | method/funnel-and-search.md | 89 | 12 | 12 | 9 |
 | method/help-page-access.md | 41 | 0 | 0 | 3 |
 | method/listing-create.md | 30 | 0 | 0 | 2 |

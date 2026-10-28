@@ -1,9 +1,49 @@
 {
   "name": "cx-listing-playbook",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "A pi package for the work on an Amazon listing: how it performs and why, a log of each change, and how to judge one.",
   "license": "MIT",
   "author": "ComChatX",
+  "comchatx": {
+    "about": "让 cx 创建和检查 listing、记录每次修改、判断修改是否见效，并看懂 Featured Offer。",
+    "mark": {
+      "line": "chart"
+    },
+    "section": "extensions",
+    "order": 50,
+    "skills": {
+      "listing-create": {
+        "about": {
+          "en": "Creating a listing in the stores you name, from your product's data.",
+          "zh": "用你的产品资料，在你指定的站点创建 listing。"
+        }
+      },
+      "listing-review": {
+        "about": {
+          "en": "How a listing performs and why, and how a change to it is checked before it is sent.",
+          "zh": "listing 表现如何、原因是什么，以及修改发出前怎样校验。"
+        }
+      },
+      "listing-change-log": {
+        "about": {
+          "en": "One file for each change to a listing: before, after, what was expected and Amazon's receipt.",
+          "zh": "每次修改 listing 记一份文件：改前改后、预期效果和亚马逊的回执。"
+        }
+      },
+      "effect-review": {
+        "about": {
+          "en": "Whether a change worked, did not, or cannot be told yet.",
+          "zh": "判断一次修改见效了、没见效，还是暂时无法判断。"
+        }
+      },
+      "featured-offer": {
+        "about": {
+          "en": "How Amazon picks the Featured Offer (Buy Box), why your offer holds it or not, and which causes a change in your store can reach.",
+          "zh": "亚马逊怎样选出 Featured Offer（Buy Box），你的报价为什么拿到或没拿到，哪些原因能在店铺里改、哪些要人去处理。"
+        }
+      }
+    }
+  },
   "homepage": "https://github.com/comchatx/cx-listing-playbook#readme",
   "repository": {
     "type": "git",
