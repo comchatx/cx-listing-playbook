@@ -1,6 +1,6 @@
 # Research for cx-listing-playbook
 
-This directory is the research base for the pi package cx-listing-playbook: the skills listing-review (which carries references/writing.md), listing-change-log and effect-review, the script scripts/report.sh, and two templates, /listing-review and /listing-watch (which writes the standing instruction); every file here was read on 2026-10-14. Sources are weighed in this order and tagged by type: Amazon's own words first, tagged [official] (Seller Central help, SP-API docs and models, Amazon Ads, aboutamazon.com, sell.amazon.com, Amazon staff posts in Seller Forums; Keepa's own documentation and code, and regulators' pages, carry the same tag); then named practitioners and vendors, tagged [opinion]; then published research and Amazon Science, tagged [research]; the researching seat's own reasoning is tagged [seat], and no skill states a [seat] item as fact. Two limits were kept: no Amazon or Keepa API host was called (no `sellingpartnerapi-*`, no `api.keepa.com`; documentation pages only), and no seller data is held here (no store names, seller ids, real seller ASINs or store figures; `<ASIN>` and `<SKU>` stand in). Seller Central help pages were read through the help hub's own content call, as recorded in method/help-page-access.md, and the standing use of that call is for the office to rule.
+This directory is the research base for the pi package cx-listing-playbook: the skills listing-review (which carries references/writing.md), listing-change-log, effect-review and listing-create, the script scripts/report.sh, and three templates, /listing-review, /listing-watch (which writes the standing instruction) and /listing-create; every file here was read on 2026-10-14, except method/listing-create.md, read on 2026-10-27. Sources are weighed in this order and tagged by type: Amazon's own words first, tagged [official] (Seller Central help, SP-API docs and models, Amazon Ads, aboutamazon.com, sell.amazon.com, Amazon staff posts in Seller Forums; Keepa's own documentation and code, and regulators' pages, carry the same tag); then named practitioners and vendors, tagged [opinion]; then published research and Amazon Science, tagged [research]; the researching seat's own reasoning is tagged [seat], and no skill states a [seat] item as fact. Two limits were kept: no Amazon or Keepa API host was called (no `sellingpartnerapi-*`, no `api.keepa.com`; documentation pages only), and no seller data is held here (no store names, seller ids, real seller ASINs or store figures; `<ASIN>` and `<SKU>` stand in). Seller Central help pages were read through the help hub's own content call, as recorded in method/help-page-access.md, and the standing use of that call is for the office to rule.
 
 ## How to read this
 
@@ -60,6 +60,7 @@ Every research file has one layout: what it covers; Amazon's rules; what practit
 | funnel-and-search.md | the funnel, its gates, which element serves which stage, Amazon search's own words | all | listing-review |
 | help-page-access.md | how Seller Central help pages were read, how to cite them, and what each captured page says, by owning file | none (method) | research upkeep; listing-review; writing.md |
 | (not in this repository) | 54 dated text captures of Seller Central help pages, each named `<page id>-v<version>`: Amazon's own text, so the office keeps them and this repository cites them as `capture <id>-v<n>` | none (evidence) | research upkeep |
+| listing-create.md | creating a listing: stores, new item against existing ASIN, product type and schema, identity and GTIN exemption, the request, variations, preview, write, read-back, sandbox, Build International Listings | none (write path) | listing-create |
 | listing-policies.md | claims, restricted words, regulators' rules, post-acceptance issues | all (policy gate) | writing.md; listing-change-log |
 | listing-writes.md | schema conformance, preview, patch and put, feeds, deletes, recording a write | none (write path) | writing.md; listing-change-log |
 | report-lifecycle.md | report and Data Kiosk lifecycles: create, poll, terminal statuses, documents, pagination, schedules, cancels, rate limits, landed receipts | none (data path) | scripts/report.sh; effect-review |
@@ -379,7 +380,7 @@ Each position is one sentence, followed by the P-ids that carry it and the names
 - **S24.** A bulk change goes as a `JSON_LISTINGS_FEED` through `createFeedDocument`, `createFeed`, `getFeed` to a terminal status and `getFeedDocument`, one store per feed. — P-listing-writes-19, 20, 21; P-seller-central-only-tools-11. [official] Submit a feed; listings-feed-schema-v2.json; Deprecation of Feeds API support for XML and Flat File Listings Feeds.
 - **S25.** The FBA Fee Preview report is read within the request limit the FBA Reports page states. — P-inventory-and-fulfillment-20. [official] Fulfillment by Amazon (FBA) Reports.
 
-### The two templates and the standing instruction
+### The templates and the standing instruction
 
 - **T1.** /listing-watch writes a standing instruction that states what to watch (the ASINs, the competitor set, the trigger families), how often, the seller's own thresholds, when to speak and when to stay quiet, and where to report, with no default threshold supplied. — P-triggers-13. [opinion] Jungle Scout, Amazon Product Alerts; Helium 10, Alerts; Google SRE ch. 6.
 - **T2.** Between summaries cx speaks only for a new signal the seller can act on (a suppression, a lost Featured Offer, a stock-out, a content change nobody on the seller's side made), and everything else goes into the scheduled summary. — P-triggers-14. [official] Manage Listings Issues. [opinion] Google SRE ch. 6.
@@ -400,6 +401,19 @@ Each position is one sentence, followed by the P-ids that carry it and the names
 - **T17.** Deal and coupon eligibility floors and event deadlines are stated only from Amazon's page by name and recorded version, or from the seller's Seller Central copy, with both floors (seller and product) given. — P-seasonality-and-events-11, 26; P-badges-and-placements-14. [official] Amazon deals; Coupon eligibility criteria; Price discounts; Prime Day | Sell on Amazon.
 - **T18.** A help page is cited by its title, canonical id, version and read date, read first from its capture under the office's capture folder (outside this repository), and cx does not depend on the undocumented content call at run time. — P-help-page-access-1, 2, 3, 7. [official] the captured pages under the office's capture folder (outside this repository)
 - **T19.** /listing-review starts from the trigger or the seller's question, runs the gates (L2 to L10), names the stage (L1), and only then reads the elements for that stage (L13). — P-funnel-and-search-1, 3; P-triggers-1, 2. [official] My ASIN is unsearchable; Manage Listings Issues.
+
+### listing-create
+
+- **R1.** The stores a creation goes to are the ones the seller names, each checked in `getMarketplaceParticipations`, which gives that store's language and currency. — P-listing-create-1; P-sp-api-access-1. [official] sellers.json; Get the market participation of a seller.
+- **R2.** A catalog search by identifier sorts the product into an existing ASIN (offer-only listing, `PRODUCT` with `LISTING_OFFER_ONLY`, after its restrictions read) or a new item with product facts. — P-listing-create-2, 3, 22. [official] Building Listings Management Workflows Guide; Listings APIs FAQ.
+- **R3.** A new item's product type comes from `searchDefinitionsProductTypes`, and its schema is read separately for each store, with `requirements`, `sellerId` and `parentageLevel`. That schema's keywords decide what each value must look like. — P-listing-create-4, 5, 6. [official] definitionsProductTypes_2020-09-01.json; Retrieve a Product Type Definition; Meta-Schema (v1).
+- **R4.** Identity is a GTIN the seller owns or is licensed to use, or an approved exemption with the brand spelled exactly as approved. A Brand Registry brand takes the brand's own account or one the brand authorised. — P-listing-create-9, 10, 11. [official] Product detail page rules (G200390640 v21); Listings APIs FAQ; How to create Amazon product listings.
+- **R5.** A creation is one put per store, in that store's language and currency. It carries images as locations Amazon fetches (a new object key for new content in private S3), the fulfilment record for MFN or FBA, and the compliance attributes the store's schema names, all filled from the seller's own data. — P-listing-create-7, 8, 12, 13, 14, 15. [official] listingsItems_2021-08-01.json; Submit Listings data; Submit media attributes; Manage purchasable offer; Manage Amazon Haul … Multiple-Fulfillment Use Cases.
+- **R6.** A preview is the same put with `mode=VALIDATION_PREVIEW`. It persists nothing and answers `VALID` or `INVALID`, and its issues name any required attribute the data left empty. — P-listing-create-17; P-listing-writes-5. [official] Preview errors before creating or fully updating a listing; Listings Items API Issues Troubleshooting.
+- **R7.** A family is written parent first, then each child with the relationship and the parent's theme. — P-listing-create-16. [official] Building Listings Management Workflows Guide; Submit Listings data.
+- **R8.** `ACCEPTED` starts processing. The creation is done when a read-back shows an ASIN, `BUYABLE` and `DISCOVERABLE`, and no `ERROR` issue; an empty summary is, in the FAQ's words, a submission that failed and did not match an ASIN, and Amazon states no time for any of this. — P-listing-create-18, 19. [official] Listings APIs FAQ; listingsItems_2021-08-01.json.
+- **R9.** A static sandbox answer proves only the request's path, signing and shape. Build International Listings is a Seller Central tool, so it is not part of this path. A creation is logged as a change with an empty before. — P-listing-create-20, 21, 23. [official] Selling Partner API Sandbox; Build International Listings (G202121570 v14).
+- **R10.** Each conflict issue is answered as its own text says: `4005011` change the value or contact Amazon, `4005033` revert and resubmit, `101165` make the identifiers unique and resubmit, with support where the catalog itself is wrong. — P-listing-create-24. [official] Listings Items API Issues Troubleshooting.
 
 ## Where the files disagreed, and what won
 
@@ -515,13 +529,15 @@ Every figure below was read on 2026-10-14 on the page named. No skill states the
 | Account Health Assurance window: 72 hours on one page, 13 days on another | Account Health Assurance FAQ; as cited in account-health.md |
 | Store moderation up to 24 hours | stores-best-practices, as cited in brand-story-and-store.md |
 | Keepa: variation-specific rating count frozen since 2025-04-09; price slots changed definition on 2026-02-23 | Keepa Product Object |
+| New listings: up to 24 hours for an image to appear; `getListingsItem` reflects state in 1–5 minutes and notifications in 15–20; `putListingsItem` 5 a second (burst 5 on the page, 10 in the model); validation previews 20 a second per application (patch row only); definitions 5 a second, burst 10; `getMarketplaceParticipations` 0.016 a second, burst 15; schema links valid seven days; no stated time for ASIN assignment | Product image guide (G1881 v28); Add product images and video (G200216080 v15); Listings APIs FAQ; Listings Items API Rate Limits; listingsItems_2021-08-01.json; definitionsProductTypes_2020-09-01.json; sellers.json; Retrieve a Product Type Definition (read 2026-10-27, as cited in method/listing-create.md) |
+| Seller Central's Add a Product form: up to five bullets and nine photos | How to create Amazon product listings (sell.amazon.com, Apr 29, 2026) |
 
 ## Open questions
 
 ### For Jack's word
 
 - **The content call.** May the help hub's undocumented content call have any standing use, at research or at run time? Until ruled, no further pages are fetched through it. (help-page-access OQ1; the office rules.)
-- **Is a preview a write?** Does `VALIDATION_PREVIEW` on a real store count as a write under "nothing sent without the seller's word", including previews for price, claim or title tests?
+- **Is a preview a write?** Ruled by brief 2026-10-26-87: a preview (`putListingsItem` or `patchListingsItem` with `mode=VALIDATION_PREVIEW`) persists nothing (P-listing-writes-5), so it is sent as any read is; a write without the mode waits for the seller's word (R6, R8).
 - **Acceptable Use Policy.** How does AUP 4.3 bear on Keepa use and on recommending third-party tools?
 - **Brand Analytics terms.** May Brand Analytics figures be kept in change files and reports under the Brand Analytics Terms and Conditions (P-own-traffic-funnel-23)? (Jack, or counsel.)
 - **Selling Partner plugin.** Is the Selling Partner plugin in scope for the box?
@@ -620,12 +636,13 @@ Counts are rows of each file's *Pages read* table, so a page read by several fil
 | method/effect-measurement.md | 50 | 12 | 26 | 6 |
 | method/funnel-and-search.md | 89 | 12 | 12 | 9 |
 | method/help-page-access.md | 41 | 0 | 0 | 3 |
+| method/listing-create.md | 30 | 0 | 0 | 2 |
 | method/listing-policies.md | 93 | 15 | 7 | 11 |
 | method/listing-writes.md | 79 | 8 | 3 | 2 |
 | method/report-lifecycle.md | 62 | 4 | 1 | 5 |
 | method/seller-central-only-tools.md | 51 | 7 | 2 | 3 |
 | method/sp-api-access.md | 40 | 2 | 0 | 6 |
 | method/triggers.md | 84 | 10 | 6 | 4 |
-| **total** | **2513** | **399** | **204** | **235** |
+| **total** | **2543** | **399** | **204** | **237** |
 
-Distinct URLs on rows that were read (first URL per row): 1,663. The unreachable rows come to 166 distinct addresses not read by any other file. The office's capture folder (outside this repository) holds 54 dated captures of Seller Central help pages. The files hold about 897 position IDs across 19 angle, 10 element and 10 method files, merged into the 270 positions above.
+Distinct URLs on rows that were read (first URL per row): 1,663. The unreachable rows come to 166 distinct addresses not read by any other file. The office's capture folder (outside this repository) holds 54 dated captures of Seller Central help pages. The files hold about 921 position IDs across 19 angle, 10 element and 11 method files, merged into the 280 positions above (method/listing-create.md's 24 into R1–R10, its 32 page rows counted in the table but not in the distinct-URL figure).

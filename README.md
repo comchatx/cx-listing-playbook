@@ -1,8 +1,8 @@
 # cx-listing-playbook
 
-A [pi](https://pi.dev) package for the work on an Amazon listing: how it performs and why, a log of each change, and how to judge whether a change worked. It is written for the assistant in a [ComChatX](https://comchatx.com) seller's box, and reads the seller's Amazon account through the box's `cx` command.
+A [pi](https://pi.dev) package for the work on an Amazon listing: creating it, how it performs and why, a log of each change, and how to judge whether a change worked. It is written for the assistant in a [ComChatX](https://comchatx.com) seller's box, and reads the seller's Amazon account through the box's `cx` command.
 
-It is text and one script. Every sentence of the skills ends with the research item it rests on, and the research is in [`research/`](research/README.md).
+It is text and one script. Its changes are in [CHANGELOG.md](CHANGELOG.md). Every sentence of the skills ends with the research item it rests on, and the research is in [`research/`](research/README.md).
 
 ## What it holds
 
@@ -10,7 +10,9 @@ It is text and one script. Every sentence of the skills ends with the research i
 |---|---|
 | `skills/listing-review` | The funnel and which element serves each stage, what Amazon's own answers show about a listing, the signals that something changed, which file carries each figure, how a write is validated (`references/writing.md`), and `scripts/report.sh` |
 | `skills/listing-change-log` | One file per listing change: before, after, what was expected and from which file, the words bet on, the seller's decision, the request as it would be sent, Amazon's receipt id and the observation window |
+| `skills/listing-create` | Creating a listing in the stores the seller names: new item or existing ASIN, the product type and each store's schema, identity, the request built from the seller's data, the preview (sent as a read, since it persists nothing), the write on the seller's word, the read-back until buyable and discoverable, and variation families |
 | `skills/effect-review` | Experiments, baseline and observation windows, controls, confounders, and the three verdicts: held, not held, cannot tell |
+| `prompts/listing-create.md` | `/listing-create <marketplaces> <your words, and where the product's data is>`: hands the seller's words to cx, e.g. `/listing-create US,DE 新品上架，数据在 /tenant/products/new-router/，FBA 发货` |
 | `prompts/listing-review.md` | `/listing-review <ASIN>`: the listing and its issues, the market since last time, a proposal with its reasons |
 | `prompts/listing-watch.md` | `/listing-watch <ASIN> <your words>`: writes the standing instruction for that listing from the seller's words, e.g. `/listing-watch <ASIN> 以后每天帮我盯着这个 listing，有要改的告诉我，没事别吵` |
 
@@ -52,7 +54,7 @@ On ComChatX, a seller installs it from the Plugins page.
 ```bash
 npm ci
 npm run typecheck
-npm test               # pi at the pin loads the package and expands both templates; every text line cites a research item;
+npm test               # pi at the pin loads the package and expands every template; every text line cites a research item;
                        # the script runs against a stub cx
 ```
 

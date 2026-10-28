@@ -1,6 +1,6 @@
 {
   "name": "cx-listing-playbook",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "A pi package for the work on an Amazon listing: how it performs and why, a log of each change, and how to judge one.",
   "license": "MIT",
   "author": "ComChatX",
