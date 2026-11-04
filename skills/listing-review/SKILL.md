@@ -38,6 +38,10 @@ It lands the document and `receipt.json` under `/tenant/reports/<reportType>/<as
 `CANCELLED` is no report (explicit cancel, no data, or a repeat inside the type's period), never zero sales (P-report-lifecycle-2).
 The amazon-sp-api skill's references/door.md holds report names, options and periods (P-report-lifecycle-7).
 
+## Showing a series
+
+After a chart, a table of its key time points (at most six rows) and one insight is this playbook's default; the model may choose another form that suits the question (P-playbook-defaults-1).
+
 ## References
 
 [writing.md](references/writing.md): schema limits, titles. [write-path.md](references/write-path.md): validating writes. [funnel.md](references/funnel.md): stages, gates, rank. [good-listing.md](references/good-listing.md): element health. [signals.md](references/signals.md): triggers, offer, stock. [figures.md](references/figures.md): figure sources. [policy.md](references/policy.md): policy screens. [reports.md](references/reports.md): reports, feeds. [watch.md](references/watch.md): watching.

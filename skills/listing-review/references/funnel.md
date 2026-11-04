@@ -20,7 +20,8 @@ Each sentence ends with the research item it rests on: P-<file>-<n> is in the pa
 - Search terms serve exposure only (P-search-terms-1).
 - The main image serves click-through; secondary images, video and 3D serve conversion (P-images-and-video-1).
 - A+ and Brand Story are conversion-stage elements, and an A+ change is judged at conversion (P-a-plus-content-1; P-funnel-and-search-30).
-- Amazon states that A+ image alt text helps search; no Amazon page says whether A+ body text is searched (P-funnel-and-search-30).
+- Amazon states that A+ image alt text helps search; no Amazon page read on 2026-10-14 says whether A+ body text is searched, a platform fact that can change (P-funnel-and-search-30).
+- That A+ serves conversion is playbook knowledge, not a ban on what A+ text may say (P-playbook-defaults-3).
 
 ## Gates copy does not fix
 

@@ -1,6 +1,6 @@
 # Creating a listing: the seller's stores, the product type, the schema, identity, the preview, the write and the read-back
 
-Read 2026-10-27 by the research seat for brief 2026-10-26-87. Tags: [official] Amazon's own page, model or staff post; [opinion] a named practitioner or a seller's report; [research] published research; [seat] the seat's own reasoning, never a skill position.
+Read 2026-10-27 by the research seat for brief 2026-10-26-87. Positions P-listing-create-25 and 26, open question 10 and their three forum rows were added 2026-11-04 for brief 2026-11-03-54. Tags: [official] Amazon's own page, model or staff post; [opinion] a named practitioner or a seller's report; [research] published research; [seat] the seat's own reasoning, never a skill position.
 
 ## What this covers
 
@@ -335,6 +335,9 @@ None was found that bears on the create path. The catalog-reconciliation papers 
 | Seller Forums: Listing Lounge: Your GTIN Exemption Was Approved, But Now You Received An Error Message. What's Next? | https://sellercentral.amazon.com/seller-forums/discussions/t/a1257c84-e37a-439d-9c04-d731a0783edc | "2 years ago" | 2026-10-27 | Exemption spelling and wait; 5665, 5461, 8541, 8542 |
 | GitHub: Cannot create new listings and ASINs (#2711) | https://github.com/amzn/selling-partner-api-models/issues/2711 | 2023-09-22 | 2026-10-27 | 8566 and 8572 after an accepted put |
 | sell.amazon.com/blog/upc-codes; sell.amazon.com/learn/upc-codes | as named | none | 2026-10-27 | Not pages: 404 |
+| Seller Forums: Listings Lounge: Difference between 'Merchant Release Date' and 'Offer Release Date' in Listing Offer tab | https://sellercentral.amazon.com/seller-forums/discussions/t/72cc7098-459b-477c-aff6-b02df3c7d160 | "2 years ago" | 2026-11-04 | Answer by Michelle_Amazon: Merchant Release Date as the product's first release, blank for most products; offer release start date as the first day of delivery and orders |
+| Seller Forums: Release Dates Decoded: Is Your Product Launch Set Up for Success? | https://sellercentral.amazon.com/seller-forums/discussions/t/470084dd-d5f5-4e40-be04-d00b2532e25b | "a year ago" | 2026-11-04 | Post by Michelle_Amazon: Offer Release Date as when pre-orders open; Merchant Release Date as the first day a pre-orderable product can be delivered, optional for most products |
+| Seller Forums: What exactly is the "Product Site Launch Date" on the Listing Product Details Tab? | https://sellercentral.amazon.com/seller-forums/discussions/t/e9d4654d-8d93-4d16-afcc-33e0842d6324 | "2 years ago" | 2026-11-04 | A seller's answer only; the Amazon-named reply defines no date. No position rests on it |
 
 ## Open questions
 
@@ -347,6 +350,7 @@ None was found that bears on the create path. The catalog-reconciliation papers 
 7. **The GTIN exemption page.** G200426310 was not read. *Settles:* the office's ruling on the content call, or a signed-in read by the seller or Jack.
 8. **WEEE and EPR in a listing.** Whether any EU store's schema names a WEEE or packaging-EPR attribute. *Settles:* `getDefinitionsProductType` for the seller's product type in each EU store named.
 9. **Children in the same request window as the parent.** Whether a child put sent before the parent's creation finishes processing is refused or held. The pages say only that the parent is created first. *Settles:* the first family creation, read back between the parent and the children.
+10. **The three release dates in a store's schema.** No product-type schema was read for this file (the OpenAPI models at the pin carry none; a product type's schema comes only from `getDefinitionsProductType`, which no seat called). So the attribute names behind Seller Central's Product Site Launch Date, Offering Release Date and Merchant Release Date, and each one's `title` and `description`, are not known here. No Amazon page read defines Product Site Launch Date, and the two Amazon-named forum posts disagree on which of the other two opens pre-orders. *Settles:* the first `getDefinitionsProductType` for the seller's product type and store, read at run time.
 
 ## Positions
 
@@ -374,6 +378,8 @@ None was found that bears on the create path. The catalog-reconciliation papers 
 - **P-listing-create-22.** `getListingsRestrictions` is read by ASIN, so it applies to an offer-only listing, and a new item's approval requirement shows as a `QUALIFICATION_REQUIRED` issue on the preview or the write. Sources: listingsRestrictions_2021-08-01.json; Get listings restrictions for an item in the catalog; listingsItems_2021-08-01.json.
 - **P-listing-create-23.** Amazon keeps no history of a listing, so a creation is a change whose before is empty, and what cx sent and what Amazon answered are kept only in the change log. Sources: listingsItems_2021-08-01.json; Listings Items API (as cited in listing-writes.md).
 - **P-listing-create-24.** A conflict issue is answered as its own text says: `4005011` by changing the submitted value to the catalog's or by contacting Amazon to change the catalog's; `4005033` by reverting to the original value and resubmitting, with a support case to dispute the original; `101165` by making the SKU, external ID and ASIN unique and resubmitting, with support where the duplicate is in Amazon's catalog. Sources: Listings Items API Issues Troubleshooting.
+- **P-listing-create-25.** An Amazon-named account in Seller Forums describes the Merchant Release Date as the date the product was first released, which "can be left blank for most products", and the offer release date as the first day the seller can deliver and buyers can order once the item is live. A second post by the same account says instead that the Offer Release Date opens pre-orders and the Merchant Release Date is the first day a pre-orderable product can be delivered. Neither post shows a staff badge or an absolute date. Sources: Seller Forums "Listings Lounge: Difference between 'Merchant Release Date' and 'Offer Release Date' in Listing Offer tab"; Seller Forums "Release Dates Decoded".
+- **P-listing-create-26.** No Amazon page read defines the Product Site Launch Date. Amazon's Sales Rank FAQ names the release date and the product site launch date among the dates to keep accurate for the New Release badge. What a date attribute is called in a store, and what it governs there, is in that store's product-type schema: the attribute's `title` and `description`, read at run time. Sources: Sales Rank FAQ (G202059240 v2, as cited in badges-and-placements.md); Amazon Product Type Definitions Meta-Schema (v1); Retrieve a Product Type Definition.
 
 ### The seat's own (not for a skill)
 

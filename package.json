@@ -1,6 +1,6 @@
 {
   "name": "cx-listing-playbook",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "A pi package for the work on an Amazon listing: how it performs and why, a log of each change, and how to judge one.",
   "license": "MIT",
   "author": "ComChatX",
@@ -42,6 +42,14 @@
           "zh": "分析亚马逊如何分配 Buy Box、你的报价为何拿到或没拿到，以及哪些原因能在店铺里解决。"
         }
       }
+    },
+    "prompts": {
+      "listing-create": {
+        "zh": "用你自己的话和产品资料，在你指定的站点创建亚马逊 listing，例如 /listing-create US,DE 新品上架，数据在 /tenant/products/new-router/，FBA 发货。"
+      },
+      "listing-review": {
+        "zh": "检查一条亚马逊 listing：表现如何、有什么变化、该改什么。"
+      }
     }
   },
   "homepage": "https://github.com/comchatx/cx-listing-playbook#readme",
@@ -65,7 +73,8 @@
   "files": [
     "skills",
     "prompts",
-    "research"
+    "research",
+    "README.zh-CN.md"
   ],
   "scripts": {
     "typecheck": "tsc --noEmit",
