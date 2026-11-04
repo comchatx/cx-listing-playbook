@@ -64,6 +64,7 @@ Every research file has one layout: what it covers; Amazon's rules; what practit
 | listing-create.md | creating a listing: stores, new item against existing ASIN, product type and schema, identity and GTIN exemption, the request, variations, preview, write, read-back, sandbox, Build International Listings | none (write path) | listing-create |
 | listing-policies.md | claims, restricted words, regulators' rules, post-acceptance issues | all (policy gate) | writing.md; listing-change-log |
 | listing-writes.md | schema conformance, preview, patch and put, feeds, deletes, recording a write | none (write path) | writing.md; listing-change-log |
+| playbook-defaults.md | three lines the charter once held as rules and Jack moved into the playbook on 2026-08-27 as defaults: how a series is shown after a chart, A+ as conversion knowledge, the store's language as the default the seller's word overrides | none (method) | listing-review; listing-create |
 | report-lifecycle.md | report and Data Kiosk lifecycles: create, poll, terminal statuses, documents, pagination, schedules, cancels, rate limits, landed receipts | none (data path) | scripts/report.sh; effect-review |
 | seller-central-only-tools.md | MYE, RLC, VOC, Seller Assistant and other tools without an API; how handoffs are kept | all | listing-review; effect-review; /listing-watch |
 | sp-api-access.md | roles, rate limits, 429s, account identity | none (access) | scripts/report.sh; listing-review |

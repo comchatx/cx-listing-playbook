@@ -1,6 +1,14 @@
 # Changelog
 
-## 0.3.0 (unreleased)
+## 0.4.0
+
+- The plugin's page now explains, in English and Chinese, what the playbook does for you and which data it uses. The notes for developers moved to `DEVELOPING.md`.
+- The Try it lines read in your page's language: each template has one English sentence, and its Chinese is in `package.json`.
+- Before you create a listing for a product that is not on sale yet, cx knows what Amazon has said about the three release dates (Product Site Launch Date, Offering Release Date, Merchant Release Date), and what it has not said. It reads what each date means in your store from that store's own rules, so it can ask you whether to sell now or build the listing first.
+- Three habits cx can set aside when you ask: a chart is followed by a short table of its key dates and one insight; A+ is written for buyers who are deciding, and what Amazon has said about A+ text in search carries its date; a listing's text is written in each store's own language unless you ask for another, such as two languages.
+- New research: `research/method/playbook-defaults.md` and positions P-listing-create-25 and 26.
+
+## 0.3.0
 
 - `skills/featured-offer` and its `references/` (`reads.md`, `causes.md`, `support.md`): how Amazon picks the Featured Offer, how to read whether the seller's offer holds it and why not, which causes a Listings Items write reaches and which it does not, and what the Support API reads.
 - `research/method/featured-offer.md`: the facts the four angle files lacked, positions P-featured-offer-1 to 11.

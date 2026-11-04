@@ -32,6 +32,7 @@ Facts cite P-<file>-<n> in research/<angles|elements|method>/<file>.md; pointers
 - A creation is `PUT /listings/2021-08-01/items/{sellerId}/{sku}?marketplaceIds=<one>&includedData=identifiers,issues&issueLocale=<locale>` with a body of `productType`, `requirements` and `attributes` in the schema's names and shapes, one store per request (P-listing-create-7).
 - The request carries only truthful values that the seller's data or the seller supports, and compliance declarations are the seller's own, since Amazon cannot determine them (P-listing-create-9; P-listing-create-15; P-attributes-and-browse-nodes-16).
 - references/request.md holds identity, language, price, fulfilment, images and compliance.
+- For a listing built before the product is on sale, references/request.md holds what is known of the three release dates.
 
 ## Preview and write
 
@@ -65,4 +66,4 @@ Facts cite P-<file>-<n> in research/<angles|elements|method>/<file>.md; pointers
 
 ## References
 
-[request.md](references/request.md): identity, language, price, fulfilment, images, compliance. [family.md](references/family.md): parent and children. [answers.md](references/answers.md): issues and the sandbox.
+[request.md](references/request.md): identity, language, price, fulfilment, images, compliance, dates. [family.md](references/family.md): parent and children. [answers.md](references/answers.md): issues and the sandbox.

@@ -15,6 +15,7 @@
 - The tag is the one the store's schema allows under `$defs.language_tag`, written with an underscore, as in `en_US` (P-marketplaces-and-languages-7; P-title-30).
 - The schema's `locale` sets display labels only, not the language of the values written (P-listing-create-12).
 - Text is written for each store in that store's language, not copied across stores (P-marketplaces-and-languages-8; P-listing-writes-22).
+- The store's language is this playbook's default, and the seller's own word, such as asking for two languages, overrides it within the tags the store's schema allows (P-playbook-defaults-2; P-marketplaces-and-languages-7).
 
 ## Price
 
@@ -42,3 +43,11 @@
 - The compliance attributes a store's schema names, GPSR in an EU store among them, are filled from the seller's own declarations, store by store (P-listing-create-15; P-marketplaces-and-languages-11).
 - Dangerous goods, battery, safety data sheet, Prop 65 and CPSIA values come from the seller, since Amazon cannot determine them (P-attributes-and-browse-nodes-16).
 - A Prop 65 warning goes on child SKUs, not the parent (P-attributes-and-browse-nodes-18).
+
+## Dates
+
+- Seller Central's Product Site Launch Date, Offering Release Date and Merchant Release Date are date attributes whose name and meaning in a store are the `title` and `description` of that store's schema (P-listing-create-26).
+- No Amazon page read defines the Product Site Launch Date, and Amazon's Sales Rank FAQ names it, with the release date, among the dates to keep accurate for the New Release badge (P-listing-create-26; P-badges-and-placements-3).
+- An Amazon-named forum account describes the Offering Release Date as the first day buyers can order once the item is live, and the Merchant Release Date as the product's first release, which can be left blank for most products (P-listing-create-25).
+- The same account's other post says the Offer Release Date opens pre-orders, so which date opens pre-orders is not settled by Amazon's words as read on 2026-11-04 (P-listing-create-25).
+- No page read says what an empty Offering Release Date or Product Site Launch Date does (P-listing-create-25; P-listing-create-26).
