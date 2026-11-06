@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.4.1
+
+- The Plugins page's field names what the playbook builds on: `cx-amazon-sp-api`, required, since creating a listing reads your account there; `cx-keepa`, optional, for the Featured Offer's history and the deals and coupons an effect review weighs.
+
 ## 0.4.0
 
 - The plugin's page now explains, in English and Chinese, what the playbook does for you and which data it uses. The notes for developers moved to `DEVELOPING.md`.

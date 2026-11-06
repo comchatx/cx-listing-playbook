@@ -1,6 +1,6 @@
 {
   "name": "cx-listing-playbook",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "description": "A pi package for the work on an Amazon listing: how it performs and why, a log of each change, and how to judge one.",
   "license": "MIT",
   "author": "ComChatX",
@@ -50,7 +50,17 @@
       "listing-review": {
         "zh": "检查一条亚马逊 listing：表现如何、有什么变化、该改什么。"
       }
-    }
+    },
+    "builds": [
+      {
+        "on": "cx-amazon-sp-api",
+        "need": "required"
+      },
+      {
+        "on": "cx-keepa",
+        "need": "optional"
+      }
+    ]
   },
   "homepage": "https://github.com/comchatx/cx-listing-playbook#readme",
   "repository": {
