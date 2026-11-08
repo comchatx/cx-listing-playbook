@@ -394,7 +394,7 @@ Each position is one sentence, followed by the P-ids that carry it and the names
 - **T6.** Amazon's push signals reach only an AWS destination, so a watch from the box pulls state on its cadence, a notification may arrive more than once and out of order, and `ANY_OFFER_CHANGED` "External" is not read as a new seller. — P-triggers-12, 21; P-offer-competition-and-hijackers-13; P-account-health-11; P-brand-protection-and-catalog-contribution-9. [official] Notification Type Values; notifications.json; Set up notifications using the Amazon EventBridge workflow; Set up notifications using the Amazon Simple Queue Service workflow.
 - **T7.** An account watch reads the seller-performance report and `getMarketplaceParticipations` on the seller's cadence. — P-account-health-11. [official] Performance Reports; sellers.json.
 - **T8.** A stock watch reads stock-out precursors (restock alerts, days of supply, below-minimum levels, capacity blocks) and stranded units as "stock risk", never as a listing problem, and warns before a stock-out lands in a planned test window. — P-inventory-and-fulfillment-6, 7. [official] Fulfillment by Amazon (FBA) Reports; Low-inventory-level fee; Inventory performance; FBA capacity limits.
-- **T9.** The competitor set is the seller's named rivals plus Amazon's `similarItems`, each confirmed by the seller before tracking. — P-triggers-15; P-competitor-set-3. [official] getCompetitiveSummary reference; SP-API Release Notes.
+- **T9.** The competitor set is the seller's named rivals plus Amazon's `similarItems`, which are Amazon's candidates and not the seller's own set; cx confirms what each is before tracking it. — P-triggers-15; P-competitor-set-3. [official] getCompetitiveSummary reference; SP-API Release Notes.
 - **T10.** The set is frozen per window, and a re-pick is a new, dated version of the set. — P-competitor-set-6; P-competitor-discovery-13. [research] Brodersen et al.
 - **T11.** Competitor data drawn from one seller's connection is used only for that seller. — P-competitor-set-20. [official] Acceptable Use Policy 4.4 and 4.6.
 - **T12.** Seller Central-only tools (MYE, RLC, View Change History, Enhance, Seller Assistant, VOC, A+ performance, Store insights) are not read by cx: they arrive as files the seller puts in the tree, and cx never claims to have read them itself. — P-seller-central-only-tools-1, 5, 6, 7; P-a-plus-content-17; P-brand-story-and-store-12. [official] Analytics Reports; Create a listing experiment; Seller Assistant help page.
@@ -541,7 +541,7 @@ Every figure below was read on 2026-10-14 on the page named. No skill states the
 ### For Jack's word
 
 - **The content call.** May the help hub's undocumented content call have any standing use, at research or at run time? Until ruled, no further pages are fetched through it. (help-page-access OQ1; the office rules.)
-- **Is a preview a write?** Ruled by brief 2026-10-26-87: a preview (`putListingsItem` or `patchListingsItem` with `mode=VALIDATION_PREVIEW`) persists nothing (P-listing-writes-5), so it is sent as any read is; a write without the mode persists and goes live (R6, R8).
+- **Is a preview a write?** Ruled by brief 2026-10-26-87: a preview (`putListingsItem` or `patchListingsItem` with `mode=VALIDATION_PREVIEW`) persists nothing (P-listing-writes-5), so it is sent as any read is; a write without the mode is a real submission: Amazon validates and processes it and may answer `INVALID`, and whether the listing becomes buyable or discoverable shows only on the later read-back (R6, R8).
 - **Acceptable Use Policy.** How does AUP 4.3 bear on Keepa use and on recommending third-party tools?
 - **Brand Analytics terms.** May Brand Analytics figures be kept in change files and reports under the Brand Analytics Terms and Conditions (P-own-traffic-funnel-23)? (Jack, or counsel.)
 - **Selling Partner plugin.** Is the Selling Partner plugin in scope for the box?
@@ -556,7 +556,7 @@ Every figure below was read on 2026-10-14 on the page named. No skill states the
 - **"ASIN + keyword" check.** May cx test whether an ASIN is found for a keyword on the public site, given the Conditions of Use and robots.txt (P-search-rank-and-volume-7, search-terms OQ6)?
 - **Economics query.** May a Data Kiosk Economics query be run under Jack's word to settle ad dating and role?
 - **Images.** Can the box model view images, and may it fetch the image CDN under PRODUCT.md §7? (The office.)
-- **Controlled tests on a live ASIN.** Ruled 2026-11-07 by ComChatX decision D233: when to ask the seller is the model's judgement. A description-token or search-terms-tail test changes what buyers see on that ASIN while it runs.
+- **Controlled tests on a live ASIN.** Ruled by ComChatX decision D233 (2026-10-25): when to ask the seller is the model's judgement. A description-token test changes that ASIN's description while it runs. A search-terms-tail test changes data hidden from shoppers and the ASIN's search eligibility, with indexing not guaranteed.
 - **Category style guides and the calendar.** Should dated category style guides and a machine-readable event calendar be kept in the tree?
 - **Operator routine and help-page re-reads.** Who owns the operator routine, including a periodic re-read of the help-page captures?
 
