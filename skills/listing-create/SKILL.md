@@ -1,6 +1,6 @@
 ---
 name: listing-create
-description: "Creating an Amazon listing from the seller's product data in the marketplaces the seller names: the seller's stores, telling a new item from an existing ASIN, the product type and each store's schema, the request built from the seller's data, the preview, the write on the seller's word, the read-back until the listing is buyable and discoverable, and variation families. For putting a new product, or a new offer, on Amazon."
+description: "Creating an Amazon listing from the seller's product data in the marketplaces the seller names: the seller's stores, telling a new item from an existing ASIN, the product type and each store's schema, the request built from the seller's data, the preview, the write, the read-back until the listing is buyable and discoverable, and variation families. For putting a new product, or a new offer, on Amazon."
 ---
 
 Facts cite P-<file>-<n> in research/<angles|elements|method>/<file>.md; pointers cite none.
@@ -36,7 +36,7 @@ Facts cite P-<file>-<n> in research/<angles|elements|method>/<file>.md; pointers
 
 ## Preview and write
 
-- A preview is the same put with `mode=VALIDATION_PREVIEW`; it persists nothing, so it is sent as any read is, and the put without the mode waits for the seller's word (P-listing-writes-5; P-listing-create-17).
+- A preview is the same put with `mode=VALIDATION_PREVIEW`; it persists nothing, so it is sent as any read is, and the put without the mode is the write: a real submission, which Amazon validates and processes and may answer `INVALID`, and which on a SKU that exists replaces the content and drops what it omits (P-listing-writes-5; P-listing-create-17; P-listing-create-18; P-listing-create-8).
 - A preview answers `VALID` or `INVALID` with `issues` (P-listing-create-17).
 - A required attribute the data does not fill answers `INVALID`, with an issue such as `90220`, category `MISSING_ATTRIBUTE`, naming it in `attributeNames` (P-listing-create-17).
 - The write's `ACCEPTED` means the synchronous checks passed and processing began, `INVALID` means nothing was taken, and `submissionId` names the submission (P-listing-create-18).

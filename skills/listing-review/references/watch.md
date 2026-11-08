@@ -49,7 +49,7 @@ Each sentence ends with the research item it rests on: P-<file>-<n> is in the pa
 ## The competitor set
 
 - `getCompetitiveSummary` with `includedData` `similarItems` returns Amazon's list of ASINs comparable to an item (P-competitor-set-3).
-- The competitor set is the seller's named rivals plus the `similarItems` candidates the seller has confirmed (P-triggers-15; P-competitor-set-3).
+- The competitor set is the seller's named rivals plus Amazon's `similarItems` candidates, and cx confirms what each is before tracking it and says which set it used (P-triggers-15; P-competitor-set-3).
 - A comparison group is chosen on data from before the change and is valid only for units the change did not affect (Brodersen et al.), so a set altered inside an observation window is not that window's comparison, and a re-pick is a new, dated version of the set (P-competitor-set-6).
 - An entrant that arrives on the core terms during a window is a confounder of that window, not a new member of its control (P-competitor-discovery-13).
 - Amazon's Acceptable Use Policy forbids aggregating data across Authorized Users' businesses to provide or sell to any party (4.4) and disclosing it to other application users (4.6), so competitor data from one seller's connection serves only that seller (P-competitor-set-20).

@@ -910,7 +910,7 @@ Internal, read for what the run did (not cited as Amazon):
 - **P-listing-writes-13.** For titles in non-media product types, cx proposes `item_name` within the schema's limit plus `title_differentiation`. It warns that a longer `item_name` is accepted but may be reconciled, split, or replaced by an AI recommendation. Sources: Submit modular titles; Seller Forums "Updates to improve your product titles begin on July 27".
 - **P-listing-writes-14.** cx does not resend unchanged data. Amazon says duplicate submissions lengthen processing. Sources: Building Listings Management Workflows Guide.
 - **P-listing-writes-15.** A product type schema cx has fetched may be reused, but is re-fetched when the product type definitions change. Sources: Building Listings Management Workflows Guide (the caching note under step 3); Notification Type Values; definitionsProductTypes_2020-09-01.json (`checksum`).
-- **P-listing-writes-16.** cx proposes a delete only as an irreversible change, never as a cheap way to fix a listing. Before the seller approves, cx tells them what the delete takes with it:
+- **P-listing-writes-16.** cx proposes a delete only as an irreversible change, never as a cheap way to fix a listing. When cx proposes one, it says what the delete takes with it:
   - the offer in that store;
   - the item's relationships (all children's, for a parent);
   - the FBA link, if a re-created listing does not have the same SKU and ASIN;

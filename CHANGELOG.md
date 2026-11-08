@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.5.0
+
+- cx judges when to ask you before it writes to your store, as ComChatX's decision D233 rules: no sentence of the playbook makes a step wait for your yes any more. A seller who tells cx to ask before any change has that followed.
+- Each such sentence now says the fact it rested on. A preview persists nothing. A write without the preview is a real submission: Amazon checks and processes it and may refuse it, and only a later read-back shows whether buyers can find and buy the listing. A put on a SKU that exists replaces its content. A family change can delete listings and unlink every child, and names its reversal path. A new report schedule silently replaces the one before it. A description test changes the ASIN's description while it runs, and a search-terms test changes hidden data and where the ASIN can appear in search, with indexing not guaranteed.
+- The change log keeps your words on a change where you gave any.
+- Two open research questions on variation families no longer name a seller-approved SKU or parent as where their preview runs: a sandbox or a live one serves, since a preview persists nothing. One research question on prices no longer waits for anyone's word before its preview, for the same reason.
+- Amazon's `similarItems` are candidates for the competitor set, and cx confirms what each is before tracking it, where the set used to hold only the candidates the seller had confirmed.
+- The README no longer promises a yes before each write, in English or Chinese.
+
 ## 0.4.1
 
 - The Plugins page's field names what the playbook builds on: `cx-amazon-sp-api`, required, since creating a listing reads your account there; `cx-keepa`, optional, for the Featured Offer's history and the deals and coupons an effect review weighs.
