@@ -70,7 +70,7 @@
 
 - The baseline holds the bidding strategy, placement adjustments and bid or budget rules of every campaign advertising the changed SKU (P-paid-keywords-16).
 - Under dynamic or rule-based bidding the measured effect includes the ads' automatic response; under `MANUAL` bids with no ad edits in either window it is closer to the listing's own effect (P-paid-keywords-18).
-- Whether bids are held fixed during a window is the seller's decision, and the record holds it (P-paid-keywords-18).
+- Whether bids are held fixed during a window changes which effect is measured, and the record holds it (P-paid-keywords-18).
 - Sponsored Products creative shows the title and automatic targeting draws on product information, so ad impressions and click-through are part of a title change's effect on an advertised ASIN (P-title-27).
 
 ## Families and deletes
