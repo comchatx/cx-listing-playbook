@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.5.1
+
+- The package's `description`, which the Plugins page draws as the English card line, speaks to a seller: "Lets cx create and review listings, and judge changes." It said "A pi package for the work on an Amazon listing: how it performs and why, a log of each change, and how to judge one."
+
 ## 0.5.0
 
 - cx judges when to ask you before it writes to your store, as ComChatX's decision D233 rules: no sentence of the playbook makes a step wait for your yes any more. A seller who tells cx to ask before any change has that followed.
