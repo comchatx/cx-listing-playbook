@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.5.2
+
+- The card line leads with the job: "Finds why a listing won't sell, then judges if each fix worked." in English, as npm's `description`, and 「找出 listing 卖不动的原因，改后判断是否见效。」 in Chinese, as `comchatx.about`. They said "Lets cx create and review listings, and judge changes." and 「让 cx 创建和检查 listing、分析 Buy Box，记录并评估每次修改。」.
+- The README, in English and Chinese, opens on finding why a listing isn't selling and judging the change afterwards, then gives three questions to ask. Its own 「试一试」 / "Try it", whose prompts the Plugins page already shows, and "Where cx keeps things", which spoke to a developer, are gone; the research stays in the package, under `research/`.
+
 ## 0.5.1
 
 - The package's `description`, which the Plugins page draws as the English card line, speaks to a seller: "Lets cx create and review listings, and judge changes." It said "A pi package for the work on an Amazon listing: how it performs and why, a log of each change, and how to judge one."

@@ -1,11 +1,11 @@
 {
   "name": "cx-listing-playbook",
-  "version": "0.5.1",
-  "description": "Lets cx create and review listings, and judge changes.",
+  "version": "0.5.2",
+  "description": "Finds why a listing won't sell, then judges if each fix worked.",
   "license": "MIT",
   "author": "ComChatX",
   "comchatx": {
-    "about": "让 cx 创建和检查 listing、分析 Buy Box，记录并评估每次修改。",
+    "about": "找出 listing 卖不动的原因，改后判断是否见效。",
     "mark": {
       "line": "chart"
     },
