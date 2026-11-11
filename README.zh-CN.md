@@ -14,5 +14,3 @@ cx 也能用你的产品资料，在你指定的站点创建 listing，并回查
 
 - **Amazon SP-API**：你的亚马逊卖家账户，在 Amazon SP-API 插件里连接。cx 在这里读取你的 listing、报价和报告，也在这里修改 listing。
 - **Keepa**（如果你装了）：价格和排名的历史，以及竞品的 listing。
-
-两者各是一个插件，价格见各自的页面。

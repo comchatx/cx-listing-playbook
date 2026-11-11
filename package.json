@@ -1,10 +1,11 @@
 {
   "name": "cx-listing-playbook",
-  "version": "0.5.2",
+  "version": "0.5.3",
   "description": "Finds why a listing won't sell, then judges if each fix worked.",
   "license": "MIT",
   "author": "ComChatX",
   "comchatx": {
+    "name": "Amazon Listing Playbook",
     "about": "找出 listing 卖不动的原因，改后判断是否见效。",
     "mark": {
       "line": "chart"
@@ -45,7 +46,7 @@
     },
     "prompts": {
       "listing-create": {
-        "zh": "用你自己的话和产品资料，在你指定的站点创建亚马逊 listing，例如 /listing-create US,DE 新品上架，数据在 /tenant/products/new-router/，FBA 发货。"
+        "zh": "在指定站点，按你的描述和产品资料创建 listing。"
       },
       "listing-review": {
         "zh": "检查一条亚马逊 listing：表现如何、有什么变化、该改什么。"
