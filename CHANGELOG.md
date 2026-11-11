@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.5.3
+
+- The plugin's name is the one signed on 2026-11-11, "Amazon Listing Playbook", in `comchatx.name`.
+- The Chinese line of the `listing-create` template is the signed words, 「在指定站点，按你的描述和产品资料创建 listing。」, with no slash command and no `/tenant/` path. It said 「用你自己的话和产品资料，在你指定的站点创建亚马逊 listing，例如 /listing-create US,DE 新品上架，数据在 /tenant/products/new-router/，FBA 发货。」.
+- The README's sentence "Each is its own plugin, and its page gives its price." and its Chinese, 「两者各是一个插件，价格见各自的页面。」, are gone.
+
 ## 0.5.2
 
 - The card line leads with the job: "Finds why a listing won't sell, then judges if each fix worked." in English, as npm's `description`, and 「找出 listing 卖不动的原因，改后判断是否见效。」 in Chinese, as `comchatx.about`. They said "Lets cx create and review listings, and judge changes." and 「让 cx 创建和检查 listing、分析 Buy Box，记录并评估每次修改。」.
