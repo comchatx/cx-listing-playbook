@@ -12,5 +12,5 @@ cx 也能用你的产品资料，在你指定的站点创建 listing，并回查
 
 ## 用到的数据
 
-- **亚马逊卖家接口**：你的亚马逊卖家账户，在亚马逊卖家接口插件里连接。cx 在这里读取你的 listing、报价和报告，也在这里修改 listing。
-- **Keepa 数据接口**（如果你装了）：价格和排名的历史，以及竞品的 listing。
+- **[亚马逊卖家接口](https://www.npmjs.com/package/cx-amazon-sp-api)**：你的亚马逊卖家账户，在亚马逊卖家接口插件里连接。cx 在这里读取你的 listing、报价和报告，也在这里修改 listing。
+- **[Keepa 数据接口](https://www.npmjs.com/package/cx-keepa)**（如果你装了）：价格和排名的历史，以及竞品的 listing。
