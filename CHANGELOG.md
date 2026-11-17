@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.5.4
+
+- The card's name is the one signed on 2026-11-17: "Amazon Listing Playbook" on the English page (`comchatx.name`) and 「亚马逊 listing 分析手册」 on the Chinese page (`comchatx.nameZh`).
+- The README, in English and Chinese, calls each plugin of ours it names by the card's name signed on 2026-11-17.
+
 ## 0.5.3
 
 - The plugin's name is the one signed on 2026-11-11, "Amazon Listing Playbook", in `comchatx.name`.

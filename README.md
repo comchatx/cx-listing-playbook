@@ -13,4 +13,4 @@ To have cx keep watching a listing for you, also install cx-listing-watch.
 ## What it uses
 
 - **Amazon SP-API:** your Amazon seller account, connected on the Amazon SP-API plugin. cx reads your listings, offers and reports there, and changes your listings there.
-- **Keepa,** where you have it: price and rank history, and your competitors' listings.
+- **Keepa API,** where you have it: price and rank history, and your competitors' listings.
