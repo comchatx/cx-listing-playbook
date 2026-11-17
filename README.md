@@ -8,7 +8,7 @@ Some things you can ask:
 
 cx also creates listings from your product's data in the stores you name, and reads each one back until buyers can find it and buy it. It keeps a record of every change, with before and after, what was expected, and Amazon's receipt.
 
-To have cx keep watching a listing for you, also install cx-listing-watch.
+To have cx keep watching a listing for you, also install [Amazon Listing Watch](https://www.npmjs.com/package/@comchatx/cx-listing-watch).
 
 ## What it uses
 

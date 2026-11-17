@@ -8,7 +8,7 @@ cx 从搜索到下单逐步检查一条 listing，找出它卖不动的原因，
 
 cx 也能用你的产品资料，在你指定的站点创建 listing，并回查到买家能搜到、能购买为止。每次修改都留一份记录，写明改前改后、预期效果和亚马逊的回执。
 
-如果想让 cx 持续帮你盯一条 listing，再装上 cx-listing-watch。
+如果想让 cx 持续帮你盯一条 listing，再装上[亚马逊 listing 巡检](https://www.npmjs.com/package/@comchatx/cx-listing-watch)。
 
 ## 用到的数据
 
