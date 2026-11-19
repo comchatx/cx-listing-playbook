@@ -1,11 +1,12 @@
 {
   "name": "cx-listing-playbook",
-  "version": "0.5.3",
+  "version": "0.5.4",
   "description": "Finds why a listing won't sell, then judges if each fix worked.",
   "license": "MIT",
   "author": "ComChatX",
   "comchatx": {
     "name": "Amazon Listing Playbook",
+    "nameZh": "亚马逊 listing 分析手册",
     "about": "找出 listing 卖不动的原因，改后判断是否见效。",
     "mark": {
       "line": "chart"

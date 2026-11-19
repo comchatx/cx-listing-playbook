@@ -8,9 +8,9 @@ Some things you can ask:
 
 cx also creates listings from your product's data in the stores you name, and reads each one back until buyers can find it and buy it. It keeps a record of every change, with before and after, what was expected, and Amazon's receipt.
 
-To have cx keep watching a listing for you, also install cx-listing-watch.
+To have cx keep watching a listing for you, also install [Amazon Listing Watch](https://www.npmjs.com/package/@comchatx/cx-listing-watch).
 
 ## What it uses
 
-- **Amazon SP-API:** your Amazon seller account, connected on the Amazon SP-API plugin. cx reads your listings, offers and reports there, and changes your listings there.
-- **Keepa,** where you have it: price and rank history, and your competitors' listings.
+- **[Amazon SP-API](https://www.npmjs.com/package/cx-amazon-sp-api):** your Amazon seller account, connected on the Amazon SP-API plugin. cx reads your listings, offers and reports there, and changes your listings there.
+- **[Keepa API](https://www.npmjs.com/package/cx-keepa),** where you have it: price and rank history, and your competitors' listings.

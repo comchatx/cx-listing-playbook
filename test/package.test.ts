@@ -99,7 +99,8 @@ it("the same check fails a copy whose featured-offer description is emptied", as
 }, 120_000);
 
 it("carries its signed name and the signed Chinese of listing-create, with no slash command and no /tenant/ path", () => {
-  const manifest = JSON.parse(readFileSync(join(ROOT, "package.json"), "utf8")) as { comchatx: { name: string; prompts: Record<string, { zh: string }> } };
+  const manifest = JSON.parse(readFileSync(join(ROOT, "package.json"), "utf8")) as { comchatx: { name: string; nameZh: string; prompts: Record<string, { zh: string }> } };
   expect(manifest.comchatx.name).toBe("Amazon Listing Playbook");
+  expect(manifest.comchatx.nameZh).toBe("亚马逊 listing 分析手册");
   expect(manifest.comchatx.prompts["listing-create"]!.zh).toBe("在指定站点，按你的描述和产品资料创建 listing。");
 });

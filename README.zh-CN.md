@@ -8,9 +8,9 @@ cx 从搜索到下单逐步检查一条 listing，找出它卖不动的原因，
 
 cx 也能用你的产品资料，在你指定的站点创建 listing，并回查到买家能搜到、能购买为止。每次修改都留一份记录，写明改前改后、预期效果和亚马逊的回执。
 
-如果想让 cx 持续帮你盯一条 listing，再装上 cx-listing-watch。
+如果想让 cx 持续帮你盯一条 listing，再装上[亚马逊 listing 巡检](https://www.npmjs.com/package/@comchatx/cx-listing-watch)。
 
 ## 用到的数据
 
-- **Amazon SP-API**：你的亚马逊卖家账户，在 Amazon SP-API 插件里连接。cx 在这里读取你的 listing、报价和报告，也在这里修改 listing。
-- **Keepa**（如果你装了）：价格和排名的历史，以及竞品的 listing。
+- **[亚马逊卖家接口](https://www.npmjs.com/package/cx-amazon-sp-api)**：你的亚马逊卖家账户，在亚马逊卖家接口插件里连接。cx 在这里读取你的 listing、报价和报告，也在这里修改 listing。
+- **[Keepa 数据接口](https://www.npmjs.com/package/cx-keepa)**（如果你装了）：价格和排名的历史，以及竞品的 listing。
