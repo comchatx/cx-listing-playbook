@@ -56,7 +56,7 @@ it("/listing-watch has left for @comchatx/cx-listing-watch, and the Plugins page
 
 it("the Plugins page's field declares what the skills read: the seller's account on SP-API, required; Keepa's history, optional", () => {
   const manifest = JSON.parse(readFileSync(join(ROOT, "package.json"), "utf8")) as { comchatx: { builds: unknown } };
-  expect(manifest.comchatx.builds).toEqual([{ on: "cx-amazon-sp-api", need: "required" }, { on: "cx-keepa", need: "optional" }, { on: "cx-amazon-seller", need: "required" }]);
+  expect(manifest.comchatx.builds).toEqual([{ on: "cx-amazon-sp-api", need: "required" }, { on: "cx-keepa", need: "optional" }]);
   expect(readFileSync(join(ROOT, "skills", "listing-create", "SKILL.md"), "utf8")).toContain("GET /sellers/v1/marketplaceParticipations");
   expect(readFileSync(join(ROOT, "skills", "featured-offer", "SKILL.md"), "utf8")).toContain("Keepa's `buyBoxSellerIdHistory`");
   expect(readFileSync(join(ROOT, "skills", "effect-review", "references", "design.md"), "utf8")).toContain("Keepa `deals` and `couponHistory`");

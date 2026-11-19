@@ -61,10 +61,6 @@
       {
         "on": "cx-keepa",
         "need": "optional"
-      },
-      {
-        "on": "cx-amazon-seller",
-        "need": "required"
       }
     ]
   },
