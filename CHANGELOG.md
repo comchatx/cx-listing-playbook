@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.5.5
+
+- The README no longer names another plugin; what the playbook builds on is its `comchatx.builds`, each with its reason, as signed on 2026-11-18. The sentence "To have cx keep watching a listing for you, also install [Amazon Listing Watch](…)." and its Chinese are gone; `@comchatx/cx-listing-watch` is an optional entry with the reason 「用于让 cx 定期替你盯着一条 listing。」 / "Has cx keep watching a listing for you."
+- "What it uses" names the account, not the plugin: 「**你的亚马逊卖家账户**：cx 在这里读取你的 listing、报价和报告，也在这里修改 listing。」 / "**Your Amazon seller account:** cx reads your listings, offers and reports there, and changes your listings there." Its Keepa line is gone; the `cx-keepa` entry carries the reason 「用于对比价格和排名的历史，以及竞品的 listing。」 / "Adds price and rank history, and rivals' listings."
+- `cx-amazon-seller` is a new optional entry, with the reason 「用于让 cx 从第一条消息起就知道你在亚马逊开店。」 / "Tells cx from the start that you sell on Amazon."
+- The Chinese README and the `listing-create` skill's Chinese line say 「指定站点」 where they said 「你指定的站点」, as signed on 2026-11-15.
+- The two templates read as the seller's own message, as signed on 2026-11-17: `listing-create` is 「在【站点】创建 listing，按这些描述和产品资料：【描述，以及产品资料在哪】」 / "Create a listing in [marketplaces] from these words and my product's data: [description, and where the product data is]"; `listing-review` is 「检查【ASIN】这条 listing：表现如何、有什么变化、该改什么。」 / "Review [ASIN]: how it is doing, what changed, and what to change."
+
 ## 0.5.4
 
 - The card's name is the one signed on 2026-11-17: "Amazon Listing Playbook" on the English page (`comchatx.name`) and 「亚马逊 listing 分析手册」 on the Chinese page (`comchatx.nameZh`).

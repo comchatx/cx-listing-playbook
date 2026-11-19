@@ -1,6 +1,6 @@
 {
   "name": "cx-listing-playbook",
-  "version": "0.5.4",
+  "version": "0.5.5",
   "description": "Finds why a listing won't sell, then judges if each fix worked.",
   "license": "MIT",
   "author": "ComChatX",
@@ -17,7 +17,7 @@
       "listing-create": {
         "about": {
           "en": "Creating a listing in the stores you name, from your product's data.",
-          "zh": "用你的产品资料在你指定的站点创建 listing。"
+          "zh": "用你的产品资料在指定站点创建 listing。"
         }
       },
       "listing-review": {
@@ -47,10 +47,10 @@
     },
     "prompts": {
       "listing-create": {
-        "zh": "在指定站点，按你的描述和产品资料创建 listing。"
+        "zh": "在【站点】创建 listing，按这些描述和产品资料：【描述，以及产品资料在哪】"
       },
       "listing-review": {
-        "zh": "检查一条亚马逊 listing：表现如何、有什么变化、该改什么。"
+        "zh": "检查【ASIN】这条 listing：表现如何、有什么变化、该改什么。"
       }
     },
     "builds": [
@@ -60,7 +60,27 @@
       },
       {
         "on": "cx-keepa",
-        "need": "optional"
+        "need": "optional",
+        "why": {
+          "en": "Adds price and rank history, and rivals' listings.",
+          "zh": "用于对比价格和排名的历史，以及竞品的 listing。"
+        }
+      },
+      {
+        "on": "@comchatx/cx-listing-watch",
+        "need": "optional",
+        "why": {
+          "en": "Has cx keep watching a listing for you.",
+          "zh": "用于让 cx 定期替你盯着一条 listing。"
+        }
+      },
+      {
+        "on": "cx-amazon-seller",
+        "need": "optional",
+        "why": {
+          "en": "Tells cx from the start that you sell on Amazon.",
+          "zh": "用于让 cx 从第一条消息起就知道你在亚马逊开店。"
+        }
       }
     ]
   },

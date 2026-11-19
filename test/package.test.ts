@@ -54,9 +54,14 @@ it("/listing-watch has left for @comchatx/cx-listing-watch, and the Plugins page
   }
 });
 
-it("the Plugins page's field declares what the skills read: the seller's account on SP-API, required; Keepa's history, optional", () => {
+it("the Plugins page's field declares what the skills read: the seller's account on SP-API, required; Keepa, Listing Watch and the Amazon base, optional, each with its reason", () => {
   const manifest = JSON.parse(readFileSync(join(ROOT, "package.json"), "utf8")) as { comchatx: { builds: unknown } };
-  expect(manifest.comchatx.builds).toEqual([{ on: "cx-amazon-sp-api", need: "required" }, { on: "cx-keepa", need: "optional" }]);
+  expect(manifest.comchatx.builds).toEqual([
+    { on: "cx-amazon-sp-api", need: "required" },
+    { on: "cx-keepa", need: "optional", why: { en: "Adds price and rank history, and rivals' listings.", zh: "用于对比价格和排名的历史，以及竞品的 listing。" } },
+    { on: "@comchatx/cx-listing-watch", need: "optional", why: { en: "Has cx keep watching a listing for you.", zh: "用于让 cx 定期替你盯着一条 listing。" } },
+    { on: "cx-amazon-seller", need: "optional", why: { en: "Tells cx from the start that you sell on Amazon.", zh: "用于让 cx 从第一条消息起就知道你在亚马逊开店。" } },
+  ]);
   expect(readFileSync(join(ROOT, "skills", "listing-create", "SKILL.md"), "utf8")).toContain("GET /sellers/v1/marketplaceParticipations");
   expect(readFileSync(join(ROOT, "skills", "featured-offer", "SKILL.md"), "utf8")).toContain("Keepa's `buyBoxSellerIdHistory`");
   expect(readFileSync(join(ROOT, "skills", "effect-review", "references", "design.md"), "utf8")).toContain("Keepa `deals` and `couponHistory`");
@@ -98,9 +103,10 @@ it("the same check fails a copy whose featured-offer description is emptied", as
   expect(loaded).not.toEqual({ skills: [...SKILLS], prompts: ["listing-create", "listing-review"], diagnostics: [] });
 }, 120_000);
 
-it("carries its signed name and the signed Chinese of listing-create, with no slash command and no /tenant/ path", () => {
+it("carries its signed name and the signed Chinese of its templates, with no slash command and no /tenant/ path", () => {
   const manifest = JSON.parse(readFileSync(join(ROOT, "package.json"), "utf8")) as { comchatx: { name: string; nameZh: string; prompts: Record<string, { zh: string }> } };
   expect(manifest.comchatx.name).toBe("Amazon Listing Playbook");
   expect(manifest.comchatx.nameZh).toBe("亚马逊 listing 分析手册");
-  expect(manifest.comchatx.prompts["listing-create"]!.zh).toBe("在指定站点，按你的描述和产品资料创建 listing。");
+  expect(manifest.comchatx.prompts["listing-create"]!.zh).toBe("在【站点】创建 listing，按这些描述和产品资料：【描述，以及产品资料在哪】");
+  expect(manifest.comchatx.prompts["listing-review"]!.zh).toBe("检查【ASIN】这条 listing：表现如何、有什么变化、该改什么。");
 });
