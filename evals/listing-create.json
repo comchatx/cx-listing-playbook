@@ -4,7 +4,7 @@
     {
       "id": 1,
       "name": "new-kettle-us-preview",
-      "prompt": "Create my listing in US from my words: 新品上架，水壶的资料在 /tenant/products/ember-kettle/product.md，我们自己发货。先预览一下，有问题告诉我。",
+      "prompt": "Create a listing in [marketplaces] from these words and my product's data: [description, and where the product data is] US 新品上架，水壶的资料在 /tenant/products/ember-kettle/product.md，我们自己发货。先预览一下，有问题告诉我。",
       "expected_output": "Reads the stores, searches the US catalog by the UPC (no match, so a new item), finds the product type KETTLE, reads its US schema and the schema document, checks the SKU is not already listed, builds a put from the seller's data in the schema's shapes (en_US, USD, DEFAULT with quantity, the shipping template's enum key, image locators with the https URLs), sends it with mode=VALIDATION_PREVIEW, and reports INVALID with wattage missing, without inventing a wattage or sending the real write.",
       "files": [],
       "expectations": [
@@ -23,7 +23,7 @@
     {
       "id": 2,
       "name": "existing-asin-de-offer",
-      "prompt": "Create my listing in DE from my words: 这条毯子在美国卖得不错，德国站也想上，EAN、SKU 和价格在 /tenant/products/fleece-de/product.md，走 FBA。先别真的提交。",
+      "prompt": "Create a listing in [marketplaces] from these words and my product's data: [description, and where the product data is] DE 这条毯子在美国卖得不错，德国站也想上，EAN、SKU 和价格在 /tenant/products/fleece-de/product.md，走 FBA。先别真的提交。",
       "expected_output": "Searches the DE catalog by the EAN, finds B0FIXTURE1, so makes an offer-only listing on it rather than a new detail page: reads the restrictions for B0FIXTURE1, the PRODUCT schema with LISTING_OFFER_ONLY, and previews a put with merchant_suggested_asin B0FIXTURE1, purchasable_offer in EUR for A1PA6795UKMFR9, and fulfillment_channel_code AMAZON_EU without a quantity; reports VALID and sends no real write.",
       "files": [],
       "expectations": [
@@ -40,7 +40,7 @@
     {
       "id": 3,
       "name": "cushion-family-local-images",
-      "prompt": "Create my listing in US from my words: 亚麻抱枕套两个颜色，做成一个变体，资料和图片都在 /tenant/products/linen-cushion/，帮我把整套预览一遍。",
+      "prompt": "Create a listing in [marketplaces] from these words and my product's data: [description, and where the product data is] US 亚麻抱枕套两个颜色，做成一个变体，资料和图片都在 /tenant/products/linen-cushion/，帮我把整套预览一遍。",
       "expected_output": "Searches the catalog by each child's UPC (no match), reads the PILLOW schema (at PARENT and CHILD parentage, or its allOf conditionals), previews the parent first (parentage_level parent, child_parent_sku_relationship variation, variation_theme COLOR, no offer) and then each child (parent_sku HL-LINEN-PARENT, the same theme, its colour and UPC, an offer); says the images are local files Amazon cannot fetch and puts no file path or made-up URL in media_location; sends no real write.",
       "files": [],
       "expectations": [
@@ -57,7 +57,7 @@
     {
       "id": 4,
       "name": "accepted-empty-summary-readback",
-      "prompt": "Create my listing in US from my words: 昨天提交的陶瓷杯套装（SKU HL-MUG-SET，资料在 /tenant/products/stoneware-mugs/）回了 ACCEPTED，可是网站上还搜不到，是不是再等几天就好？",
+      "prompt": "Create a listing in [marketplaces] from these words and my product's data: [description, and where the product data is] US 昨天提交的陶瓷杯套装（SKU HL-MUG-SET，资料在 /tenant/products/stoneware-mugs/）回了 ACCEPTED，可是网站上还搜不到，是不是再等几天就好？",
       "expected_output": "Reads getListingsItem for HL-MUG-SET with summaries and issues, finds no summary and the ERROR issue 100980 (barcode already on another ASIN), looks the UPC up in the catalog (B0OTHER001, another brand's product), and tells the seller that ACCEPTED was not a creation and that waiting will not fix it: the identifier conflict is what stops it. It names no fixed waiting time, invents no other UPC and sends no write.",
       "files": [],
       "expectations": [
