@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.5.7
+
+- The tile's mark on the Plugins page is the signed drawing.
+
 ## 0.5.6
 
 - Each template's body is its own Try it sentence, word for word, then the words typed after the command: `/listing-create` and `/listing-review` send the model the sentence the Plugins page shows for them.
