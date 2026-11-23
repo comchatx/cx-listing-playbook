@@ -15,12 +15,12 @@ It is text and one script. Its changes are in [CHANGELOG.md](CHANGELOG.md). Ever
 | `skills/listing-create` | Creating a listing in the stores the seller names: new item or existing ASIN, the product type and each store's schema, identity, the request built from the seller's data, the preview (sent as a read, since it persists nothing), the write, the read-back until buyable and discoverable, and variation families |
 | `skills/featured-offer` | How Amazon picks the Featured Offer (the Buy Box), how to read whether the seller's offer holds it and why not, which causes a Listings Items write reaches and which sit in Seller Central, the Brand Registry portal or Amazon's own choice, and what the Support API reads |
 | `skills/effect-review` | Experiments, baseline and observation windows, controls, confounders, and the three verdicts: held, not held, cannot tell |
-| `prompts/listing-create.md` | `/listing-create <marketplaces> <your words, and where the product's data is>`: hands the seller's words to cx, e.g. `/listing-create US,DE 新品上架，数据在 /tenant/products/new-router/，FBA 发货` |
-| `prompts/listing-review.md` | `/listing-review <ASIN>`: the listing and its issues, the market since last time, a proposal with its reasons |
+| `prompts/listing-create.md` | `/listing-create <marketplaces> <your words, and where the product's data is>`: its sentence, then the seller's words, e.g. `/listing-create US,DE 新品上架，数据在 /tenant/products/new-router/，FBA 发货` |
+| `prompts/listing-review.md` | `/listing-review <ASIN>`: its sentence, then the seller's words |
 
 Each skill's detail is under its `references/`.
 
-Each template's `description:` is one English sentence; its Chinese is `comchatx.prompts.<name>.zh` in `package.json`, beside each skill's words in `comchatx.skills`, as the Plugins page reads them.
+Each template's `description:` is one English sentence, and its body is that sentence word for word, then the seller's own words (`$@`); its Chinese is `comchatx.prompts.<name>.zh` in `package.json`, beside each skill's words in `comchatx.skills`, as the Plugins page reads them.
 
 `/listing-watch` now lives in its own package, [`@comchatx/cx-listing-watch`](https://github.com/comchatx/cx-listing-watch), which uses this one. Guarding a listing's Featured Offer is [`@comchatx/cx-featured-offer`](https://github.com/comchatx/cx-featured-offer).
 

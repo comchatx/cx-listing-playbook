@@ -1,6 +1,6 @@
 {
   "name": "cx-listing-playbook",
-  "version": "0.5.5",
+  "version": "0.5.6",
   "description": "Finds why a listing won't sell, then judges if each fix worked.",
   "license": "MIT",
   "author": "ComChatX",

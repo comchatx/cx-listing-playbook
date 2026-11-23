@@ -27,12 +27,27 @@ it("every directory under skills/ holds a SKILL.md, and each is one of the packa
   expect(directories).toEqual([...SKILLS]);
 });
 
-it("each template expands in a pi session: the ASIN or the marketplaces, and the seller's own words reach the model, no placeholder does", async () => {
-  const review = await typed(ROOT, "/listing-review B000123456");
-  expect(review).toBe("Review my listing B000123456: the listing and its issues, the market since you last looked, and your proposal with its reasons.");
-  const create = await typed(ROOT, "/listing-create US,DE 新品上架，数据在 /tenant/products/new-router/，FBA 发货");
-  expect(create).toBe("Create my listing in US,DE from my words: 新品上架，数据在 /tenant/products/new-router/，FBA 发货");
-  for (const text of [review, create]) expect(text).not.toMatch(/\$\{?[@0-9A]/);
+it("each template expands in a pi session: its sentence, then the seller's own words, no placeholder", async () => {
+  const sentence = (name: string) => /^description: "(.*)"$/m.exec(readFileSync(join(ROOT, "prompts", `${name}.md`), "utf8"))![1]!;
+  const expected: [string, string][] = [
+    ["/listing-review", sentence("listing-review")],
+    ["/listing-review B000123456", `${sentence("listing-review")} B000123456`],
+    ["/listing-create", sentence("listing-create")],
+    ["/listing-create US,DE 新品上架，数据在 /tenant/products/new-router/，FBA 发货", `${sentence("listing-create")} US,DE 新品上架，数据在 /tenant/products/new-router/，FBA 发货`],
+  ];
+  for (const [input, text] of expected) {
+    const received = await typed(ROOT, input);
+    expect(received.trim(), input).toBe(text);
+    expect(received, input).not.toMatch(/\$\{?[@0-9A]/);
+  }
+}, 120_000);
+
+it("each template's body is its description word for word, then the seller's own words", () => {
+  for (const name of ["listing-create", "listing-review"]) {
+    const text = readFileSync(join(ROOT, "prompts", `${name}.md`), "utf8");
+    const description = /^description: "(.*)"$/m.exec(text)?.[1];
+    expect(text.replace(/^---\n[\s\S]*?\n---\n/, ""), name).toBe(`${description} $@\n`);
+  }
 });
 
 it("the package carries no dependency, no install script and no extension", () => {

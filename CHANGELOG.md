@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.5.6
+
+- Each template's body is its own Try it sentence, word for word, then the words typed after the command: `/listing-create` and `/listing-review` send the model the sentence the Plugins page shows for them.
+- The `listing-create` evals' prompts read as the template now expands.
+
 ## 0.5.5
 
 - The README no longer names another plugin; what the playbook builds on is its `comchatx.builds`, each with its reason, as signed on 2026-11-18. The sentence "To have cx keep watching a listing for you, also install [Amazon Listing Watch](…)." and its Chinese are gone; `@comchatx/cx-listing-watch` is an optional entry with the reason 「用于让 cx 定期替你盯着一条 listing。」 / "Has cx keep watching a listing for you."
