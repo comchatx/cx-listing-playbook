@@ -66,7 +66,7 @@
         "need": "required",
         "why": {
           "en": "Reads your listings and reports, and sends the changes.",
-          "zh": "用于读取你的 listing 和报表，并提交修改。"
+          "zh": "用于读取你的 listing 和报告，并提交修改。"
         }
       },
       {
