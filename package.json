@@ -1,6 +1,6 @@
 {
   "name": "cx-listing-playbook",
-  "version": "0.5.7",
+  "version": "0.5.8",
   "description": "Finds why a listing won't sell, then judges if each fix worked.",
   "license": "MIT",
   "author": "ComChatX",
@@ -63,7 +63,11 @@
     "builds": [
       {
         "on": "cx-amazon-sp-api",
-        "need": "required"
+        "need": "required",
+        "why": {
+          "en": "Reads your listings and reports, and sends the changes.",
+          "zh": "用于读取你的 listing 和报表，并提交修改。"
+        }
       },
       {
         "on": "cx-keepa",

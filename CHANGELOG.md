@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.5.8
+
+- `comchatx.builds` gives Amazon SP-API, which the package needs, its line on the Plugins page: "Reads your listings and reports, and sends the changes." / 「用于读取你的 listing 和报表，并提交修改。」.
+
 ## 0.5.7
 
 - The tile's mark on the Plugins page is the signed drawing.
