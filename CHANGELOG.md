@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.5.8
+
+- `comchatx.builds[].why` names why the package needs Amazon SP-API, in both languages: "Reads your listings and reports, and sends the changes." / 「用于读取你的 listing 和报告，并提交修改。」.
+- The Chinese README's "用到的数据" names the store: 「**你的亚马逊店铺**：cx 在这里读取你的 listing、报价和报告，也在这里修改 listing。」.
+
 ## 0.5.7
 
 - The tile's mark on the Plugins page is the signed drawing.
