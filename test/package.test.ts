@@ -69,10 +69,10 @@ it("/listing-watch has left for @comchatx/cx-listing-watch, and the Plugins page
   }
 });
 
-it("the Plugins page's field declares what the skills read: the seller's account on SP-API, required; Keepa, Listing Watch and the Amazon base, optional, each with its reason", () => {
+it("the Plugins page's field declares what the skills read: the seller's account on SP-API, required, and Keepa, Listing Watch and the Amazon base, optional, each with its reason", () => {
   const manifest = JSON.parse(readFileSync(join(ROOT, "package.json"), "utf8")) as { comchatx: { builds: unknown } };
   expect(manifest.comchatx.builds).toEqual([
-    { on: "cx-amazon-sp-api", need: "required" },
+    { on: "cx-amazon-sp-api", need: "required", why: { en: "Reads your listings and reports, and sends the changes.", zh: "用于读取你的 listing 和报告，并提交修改。" } },
     { on: "cx-keepa", need: "optional", why: { en: "Adds price and rank history, and rivals' listings.", zh: "用于对比价格和排名的历史，以及竞品的 listing。" } },
     { on: "@comchatx/cx-listing-watch", need: "optional", why: { en: "Has cx keep watching a listing for you.", zh: "用于让 cx 定期替你盯着一条 listing。" } },
     { on: "cx-amazon-seller", need: "optional", why: { en: "Tells cx from the start that you sell on Amazon.", zh: "用于让 cx 从第一条消息起就知道你在亚马逊开店。" } },
